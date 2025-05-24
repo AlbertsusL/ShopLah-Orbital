@@ -21,17 +21,36 @@ const Navbar = ({ onShowAuth }) => {
             </div>  
             
             {/* Middle section with search and cart */}
-            <div className="flex justify-between items-center gap-4">
+            <div className="hidden md:flex items-center gap-5">
               
+              {/* tabs section */}
+              <div className="hidden md:flex gap-10 mr-4">
+                <a href="#" className="font-medium text-gray-600 
+                dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
+                  Top Rated
+                </a>
+                <a href="#" className="font-medium text-gray-600 
+                dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
+                  Trending
+                </a>
+                <a href="#" className="font-medium text-gray-600 
+                dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
+                  Best Selling
+                </a>
+                <a href="#" className="font-medium text-gray-600 
+                dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
+                  Contact Us
+                </a>
+              </div>
               {/* Search bar */}
               <div className="relative group hidden sm:block">
                 <input 
                   type="text"
-                  placeholder="search"
-                  className="w-[200px] sm:w-[200px] hover:w-[300px] 
+                  placeholder="Search"
+                  className="w-[200px] sm:w-[200px] hover:w-[200px] 
                   transition-all duration-200 rounded-full border border-gray-700 px-2 py-1
                   focus:outline-none focus:border-1 focus:border-primary
-                  placeholder-black bg-white"
+                  placeholder-black bg-white text-black"
                 />   
                 <IoSearchOutline 
                   className="text-black hover:text-[#f3b15c] absolute top-2.5 -translate-y-0.5 right-3"
@@ -64,7 +83,6 @@ const Navbar = ({ onShowAuth }) => {
       </div>
       
       {/* Lower Navbar - Empty for now */}
-      <div></div>
     </div>
   );
 };
