@@ -3,24 +3,31 @@ import { Link, useNavigate } from "react-router-dom";
 import email_icon from '../../assets/email.png';
 import password_icon from '../../assets/password.png';
 import './SignIn&Up.css';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../firebase/firebase"
+import { toast } from "react-toastify"
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      alert('Please fill in all fields!');
-      return;
-    }
-    
-    alert('Login successful! (This is just a demo)');
-    navigate('/');
-    setEmail('');
-    setPassword('');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("User logged in Successfully");
+      navigate("/profile")
+      toast.success("User Registered Successfully!!", {
+            position: "top-center",
+        })
+      } catch (error) {
+        console.log(error.message);
+        toast.error(error.message, {
+          position: "bottom-center",
+        })
+      }
   };
 
   return (

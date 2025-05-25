@@ -5,6 +5,9 @@ import MainPageView from "./components/MainPage/MainPageView.jsx";
 import ContactUsPage from "./components/MainPage/ContactUsPage.jsx";
 import SignInPage from "./components/LoginSignup/SignInPage.jsx";
 import SignUpPage from "./components/LoginSignup/SignUpPage.jsx";
+import Profile from "./components/profile.jsx";
+
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
@@ -19,7 +22,9 @@ const App = () => {
           <Route path="/contactuspage" element={<ContactUsPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
+        <ToastContainer />
       </div>
     </Router>
   );
