@@ -1,11 +1,11 @@
-// Simple Navbar - Just a working Sign In button!
+import user_icon from '../../assets/person.png';
 import React from "react";
 import Logo from "../../assets/logo.jpg";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaCartShopping } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
-const Navbar = ({ onShowAuth }) => {
+const Navbar = () => {
   return (
     <div>
       {/* Upper Navbar */}
@@ -15,11 +15,11 @@ const Navbar = ({ onShowAuth }) => {
             
             {/* Logo section */}
             <div>
-              <a href="#" className="font-bold text-2xl sm:text-3xl flex gap-2">
+              <Link to="/" className="font-bold text-2xl sm:text-3xl flex gap-2">
                 <img src={Logo} alt="Logo" className="w-10 uppercase" />
                 ShopLah
-              </a>    
-            </div>  
+              </Link>    
+            </div> 
             
             {/* Middle section with search and cart */}
             <div className="hidden md:flex items-center gap-5">
@@ -71,13 +71,16 @@ const Navbar = ({ onShowAuth }) => {
                 <FaCartShopping className="text-xl text-white drop-shadow sm:cursor-pointer"/>
               </button>
               
-              {/* Simple Sign In button */}
-              <button
-                onClick={onShowAuth}
-                className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-4 py-1 rounded-full hover:opacity-90 font-medium transition-opacity"
-              >
-                Sign In
-              </button>
+              {/* Sign In */}
+              <div className="flex items-center gap-2">
+                <Link 
+                  to="/signin"
+                  className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-6 py-2 rounded-full hover:opacity-90 font-medium transition-opacity flex items-center gap-2"
+                >
+                  <img src={user_icon} alt="User" width={16}/>
+                  Sign In
+                </Link>
+              </div>
             </div>
           </div>
         </div>
