@@ -3,6 +3,7 @@ import React from "react";
 import Logo from "../../assets/logo.jpg";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaCartShopping } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 const Navbar = ({ onShowAuth }) => {
   return (
@@ -37,10 +38,10 @@ const Navbar = ({ onShowAuth }) => {
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Best Selling
                 </a>
-                <a href="#" className="font-medium text-gray-600 
+                <Link to="/ContactUsPage" className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </div>
               {/* Search bar */}
               <div className="relative group hidden sm:block">
