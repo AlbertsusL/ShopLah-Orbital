@@ -43,12 +43,12 @@ const ContactUsPage = () => {
             </div>
             <div className='input-box'>
                 <label>Phone Number</label>
-                <input type='text' className='field' placeholder='Enter your Phone Number' 
+                <input type='number' className='field' placeholder='Enter your Phone Number' 
                 name='number' required/>
             </div>
             <div className='input-box'>
                 <label>Email Address</label>
-                <input type='text' className='field' placeholder='Enter your Email Address' 
+                <input type='email' className='field' placeholder='Enter your Email Address' 
                 name='email' required/>
             </div>
             <div className='input-box'>
