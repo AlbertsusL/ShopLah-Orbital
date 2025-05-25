@@ -4,6 +4,10 @@ import user_icon from '../../assets/person.png';
 import email_icon from '../../assets/email.png';
 import password_icon from '../../assets/password.png';
 import './SignIn&Up.css';
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { auth, db } from "../../firebase/firebase"
+import { setDoc,doc } from "firebase/firestore";
+import { toast } from "react-toastify"
 
 const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -12,30 +16,30 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!username || !email || !password || !confirmPassword) {
-      alert('Please fill in all fields!');
-      return;
+    try {
+      await createUserWithEmailAndPassword(auth,email,password);
+      const user = auth.currentUser;
+      console.log(user);
+      if (user) {
+        await setDoc(doc(db,"Users",user.uid), {
+          email: user.email,
+          user: username,
+          ID: user.uid,
+        });
+
+      }
+      console.log("User Registered Successfully!!")
+      toast.success("User Registered Successfully!!", {
+        position: "top-center",
+      })
+    } catch (error) {
+      console.log(error.message);
+      toast.error(error.message, {
+        position: "bottom-center",
+      })
     }
-    
-    if (password !== confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
-    
-    if (password.length < 6) {
-      alert('Password must be at least 6 characters long!');
-      return;
-    }
-    
-    alert('Account created successfully! (This is just a demo)');
-    navigate('/signin');
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
   };
 
   return (
@@ -57,7 +61,7 @@ const SignUpPage = () => {
               <img src={user_icon} alt="User" className="w-5 h-5 mr-3" />
               <input 
                 type="text" 
-                placeholder="Your Full Name" 
+                placeholder="Username" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="outline-none w-full" 
