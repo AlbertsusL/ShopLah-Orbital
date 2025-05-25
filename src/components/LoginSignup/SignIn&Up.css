@@ -7,6 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 150px;
 }
 
 .btn-primary:hover {
@@ -28,6 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 150px;
 }
 
 .btn-secondary:hover {
