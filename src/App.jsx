@@ -5,7 +5,7 @@ import MainPageView from "./components/MainPage/MainPageView.jsx";
 import ContactUsPage from "./components/MainPage/ContactUsPage.jsx";
 import SignInPage from "./components/LoginSignup/SignInPage.jsx";
 import SignUpPage from "./components/LoginSignup/SignUpPage.jsx";
-import Profile from "./components/profile.jsx";
+import Profile from "./components/ProfilePage/Profile.jsx";
 
 import { ToastContainer } from "react-toastify";
 
