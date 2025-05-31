@@ -6,6 +6,7 @@ import ContactUsPage from "./components/MainPage/ContactUsPage.jsx";
 import SignInPage from "./components/LoginSignup/SignInPage.jsx";
 import SignUpPage from "./components/LoginSignup/SignUpPage.jsx";
 import Profile from "./components/ProfilePage/Profile.jsx";
+import SellProducts from "./components/SellProducts/sellProducts.jsx";
 
 import { ToastContainer } from "react-toastify";
 
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/sellproducts" element={<SellProducts />} />
         </Routes>
         <ToastContainer />
       </div>

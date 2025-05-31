@@ -1,11 +1,61 @@
 import user_icon from '../../assets/person.png';
-import React from "react";
 import Logo from "../../assets/logo.jpg";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaCartShopping } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../../firebase/firebase";
+import { toast } from "react-toastify";
+import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "Users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setUserDetails(docSnap.data());
+          }
+        } catch (error) {
+          console.error("User data load error:", error);
+          if (error.code !== "permission-denied") {
+            toast.error("Error loading user data");
+          }
+        }
+      } else {
+        setUserDetails(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSellClick = (e) => {
+    e.preventDefault();
+    if (userDetails) {
+      navigate('/SellProducts');
+    } else {
+      toast.error("Please sign in to sell products");
+      navigate("/signin", { state: { from: '/SellProducts' } });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-16 bg-amber-300">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Upper Navbar */}
@@ -34,10 +84,9 @@ const Navbar = () => {
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Trending
                 </a>
-                <a href="#" className="font-medium text-gray-600 
-                dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
-                  Best Selling
-                </a>
+                <Link to="#" onClick={handleSellClick} className="font-medium text-gray-600 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
+                  Sell
+                </Link>
                 <Link to="/ContactUsPage" className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Contact Us
@@ -73,13 +122,23 @@ const Navbar = () => {
               
               {/* Sign In */}
               <div className="flex items-center gap-2">
-                <Link 
-                  to="/signin"
-                  className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-6 py-2 rounded-full hover:opacity-90 font-medium transition-opacity flex items-center gap-2"
-                >
-                  <img src={user_icon} alt="User" width={16}/>
-                  Sign In
-                </Link>
+                {userDetails ? (
+                  <Link 
+                    to="/profile"
+                    className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-6 py-2 rounded-full hover:opacity-90 font-medium transition-opacity flex items-center gap-2"
+                  >
+                    <img src={user_icon} alt="User" width={16} />
+                    {userDetails.user || "Profile"}
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/signin"
+                    className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-6 py-2 rounded-full hover:opacity-90 font-medium transition-opacity flex items-center gap-2"
+                  >
+                    <img src={user_icon} alt="User" width={16} />
+                    Sign In
+                  </Link>
+                )}
               </div>
             </div>
           </div>
