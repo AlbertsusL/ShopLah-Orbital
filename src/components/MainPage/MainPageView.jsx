@@ -126,17 +126,6 @@ function MainPageView() {
 
             {/* Featured Products Section */}
             <div className="container mx-auto px-4 py-16">
-                {/* Section Header */}
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
-                        Featured Products
-                    </h2>
-                    <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                        Discover our handpicked selection of trending products with amazing deals
-                    </p>
-                    <div className="h-1 w-20 bg-gradient-to-r from-[#f3b15c] to-[#ed8888] mx-auto mt-4"></div>
-                </div>
-
                 {/* Products Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {SampleProducts().map((product) => (
