@@ -38,6 +38,16 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
+  const handleBuyClick = (e) => {
+    e.preventDefault();
+    if (userDetails) {
+      navigate('/BuyProducts');
+    } else {
+      toast.error("Please sign in to sell products");
+      navigate("/signin", { state: { from: '/BuyProducts' } });
+    }
+  };
+
   const handleSellClick = (e) => {
     e.preventDefault();
     if (userDetails) {
@@ -80,7 +90,7 @@ const Navbar = () => {
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Promotion
                 </a>
-                <a href="#" className="font-medium text-gray-600 
+                <a href="#" onClick={handleBuyClick} className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Buy 
                 </a>

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from "./components/NavBar/Navbar.jsx";
 import MainPageView from "./components/MainPage/MainPageView.jsx";
 import ContactUsPage from "./components/MainPage/ContactUsPage.jsx";
@@ -7,17 +7,25 @@ import SignInPage from "./components/LoginSignup/SignInPage.jsx";
 import SignUpPage from "./components/LoginSignup/SignUpPage.jsx";
 import Profile from "./components/ProfilePage/Profile.jsx";
 import SellProducts from "./components/SellProducts/sellProducts.jsx";
+import BuyProducts from "./components/BuyProducts/BuyProducts.jsx";
+import SideNavbar from "./components/NavBar/SideNavbar.jsx";
 
 import { ToastContainer } from "react-toastify";
 
 const App = () => {
+  const location = useLocation();
+  const showSidebar = location.pathname === '/BuyProducts' || location.pathname === '/SellProducts';
+
   return (
-    <Router>
-      <div>
-        {/* Navbar appears on ALL pages */}
-        <Navbar />
-        
-        {/* Different content based on URL */}
+    <div>
+      {/* Navbar appears on ALL pages */}
+      <Navbar />
+
+      {/* Side Navbar */}
+      {showSidebar && <SideNavbar />}
+      
+      {/* Different content based on URL */}
+      <div className={showSidebar ? "ml-64" : ""}>
         <Routes>
           <Route path="/" element={<MainPageView />} />
           <Route path="/contactuspage" element={<ContactUsPage />} />
@@ -25,10 +33,12 @@ const App = () => {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/sellproducts" element={<SellProducts />} />
+          <Route path="/buyproducts" element={<BuyProducts />} />
         </Routes>
-        <ToastContainer />
       </div>
-    </Router>
+      
+      <ToastContainer />
+    </div>
   );
 }
 
