@@ -78,11 +78,11 @@ const Navbar = () => {
               <div className="hidden md:flex gap-10 mr-4">
                 <a href="#" className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
-                  Top Rated
+                  Promotion
                 </a>
                 <a href="#" className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
-                  Trending
+                  Buy 
                 </a>
                 <Link to="#" onClick={handleSellClick} className="font-medium text-gray-600 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Sell
