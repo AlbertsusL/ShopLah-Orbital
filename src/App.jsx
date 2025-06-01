@@ -9,6 +9,7 @@ import Profile from "./components/ProfilePage/Profile.jsx";
 import SellProducts from "./components/SellProducts/sellProducts.jsx";
 import BuyProducts from "./components/BuyProducts/BuyProducts.jsx";
 import SideNavbar from "./components/NavBar/SideNavbar.jsx";
+import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
 
 import { ToastContainer } from "react-toastify";
 
@@ -22,7 +23,8 @@ const App = () => {
       <Navbar />
 
       {/* Side Navbar */}
-      {showSidebar && <SideNavbar />}
+      {location.pathname === '/BuyProducts' && <BuySideNavbar />}
+      {location.pathname === '/SellProducts' && <SideNavbar />}
       
       {/* Different content based on URL */}
       <div className={showSidebar ? "ml-64" : ""}>

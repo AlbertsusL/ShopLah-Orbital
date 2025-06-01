@@ -125,7 +125,7 @@ const Navbar = () => {
                 items-center gap-3 group"
               >
                 <span className="group-hover:block hidden transition-all duration-200">
-                  Order
+                  Cart
                 </span>
                 <FaCartShopping className="text-xl text-white drop-shadow sm:cursor-pointer"/>
               </button>
