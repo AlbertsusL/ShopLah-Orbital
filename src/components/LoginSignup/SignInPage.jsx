@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import email_icon from '../../assets/email.png';
 import password_icon from '../../assets/password.png';
 import './SignIn&Up.css';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword,
+  sendPasswordResetEmail
+ } from "firebase/auth";
 import { auth, db } from "../../firebase/firebase"
 import { toast } from "react-toastify"
 
@@ -29,6 +31,21 @@ const SignInPage = () => {
         })
       }
   };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("Please enter your email address first");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Password reset email sent! Check your inbox.");
+    } catch (error) {
+      toast.error("Error sending reset email. Please try again.");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-4">
@@ -74,7 +91,7 @@ const SignInPage = () => {
             <div className="flex items-center justify-between text-sm">
               <button 
                 type="button"
-                onClick={() => alert('TBD')} 
+                onClick={handleForgotPassword} 
                 className="forgot-btn"
               >
                 Forgot password?

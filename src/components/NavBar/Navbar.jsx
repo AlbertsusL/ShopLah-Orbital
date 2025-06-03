@@ -43,7 +43,7 @@ const Navbar = () => {
     if (userDetails) {
       navigate('/BuyProducts');
     } else {
-      toast.error("Please sign in to sell products");
+      toast.error("Please sign in to buy products");
       navigate("/signin", { state: { from: '/BuyProducts' } });
     }
   };

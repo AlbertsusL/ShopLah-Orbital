@@ -18,6 +18,12 @@ const SignUpPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords don't match!", {position: "bottom-center"});
+      return;
+    }
+
     try {
       await createUserWithEmailAndPassword(auth,email,password);
       const user = auth.currentUser;
