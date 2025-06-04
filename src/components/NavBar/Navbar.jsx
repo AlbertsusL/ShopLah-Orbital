@@ -67,7 +67,7 @@ const Navbar = () => {
   }
 
   return (
-    <div>
+    <div className='sticky top-0'>
       {/* Upper Navbar */}
       <div className="shadow-md bg-white dark:bg-gray-900 dark:text-white duration-200 relative z-40">
         <div className="bg-amber-300 py-2">

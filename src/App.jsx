@@ -19,12 +19,9 @@ const App = () => {
 
   return (
     <div>
-      {/* Navbar appears on ALL pages */}
-      <Navbar />
-
-      {/* Side Navbar */}
       {location.pathname === '/BuyProducts' && <BuySideNavbar />}
       {location.pathname === '/SellProducts' && <SideNavbar />}
+      <Navbar />
       
       {/* Different content based on URL */}
       <div className={showSidebar ? "ml-64" : ""}>
