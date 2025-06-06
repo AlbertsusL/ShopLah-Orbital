@@ -10,16 +10,23 @@ import SellProducts from "./components/SellProducts/sellProducts.jsx";
 import BuyProducts from "./components/BuyProducts/BuyProducts.jsx";
 import SideNavbar from "./components/NavBar/SideNavbar.jsx";
 import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
-
+import ProductDetail from "./components/BuyProducts/ProductDetail.jsx";
+import SearchPage from "./components/BuyProducts/SearchPage.jsx";
+import Checkout from "./components/BuyProducts/Checkout.jsx";
 import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const location = useLocation();
-  const showSidebar = location.pathname === '/BuyProducts' || location.pathname === '/SellProducts';
+  const showSidebar = location.pathname === '/BuyProducts' || 
+                     location.pathname === '/SellProducts' ||
+                     location.pathname === '/search' ||
+                     location.pathname.startsWith('/product/');
 
   return (
     <div>
-      {location.pathname === '/BuyProducts' && <BuySideNavbar />}
+      {(location.pathname === '/BuyProducts' || 
+        location.pathname === '/search' || 
+        location.pathname.startsWith('/product/')) && <BuySideNavbar />}
       {location.pathname === '/SellProducts' && <SideNavbar />}
       <Navbar />
       
@@ -33,6 +40,9 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/sellproducts" element={<SellProducts />} />
           <Route path="/buyproducts" element={<BuyProducts />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </div>
       
