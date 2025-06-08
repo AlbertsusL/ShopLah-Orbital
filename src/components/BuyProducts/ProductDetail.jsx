@@ -85,8 +85,20 @@ const ProductDetail = () => {
     toast.success(`Added ${quantity} ${product.name}(s) to cart!`);
   };
 
+  const handleBackToSearch = () => {
+    navigate('/buy/search');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Back button */}
+      <button 
+        onClick={handleBackToSearch}
+        className="mb-4 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+      >
+        ← Back to Search
+      </button>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Product Image */}

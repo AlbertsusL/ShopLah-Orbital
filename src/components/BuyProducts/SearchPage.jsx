@@ -68,11 +68,15 @@ const SearchPage = () => {
     return stars;
   };
 
+  const handleProductClick = (productId) => {
+    navigate(`/buy/product/${productId}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Search Products</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Browse Products</h1>
         
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg shadow-md mb-6">
@@ -103,7 +107,7 @@ const SearchPage = () => {
             <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
               
               {/* Product Image */}
-              <div className="relative overflow-hidden cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+              <div className="relative overflow-hidden cursor-pointer" onClick={() => handleProductClick(product.id)}>
                 <img 
                   src={product.image} 
                   alt={product.name}
@@ -117,7 +121,7 @@ const SearchPage = () => {
 
               {/* Product Info */}
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1 cursor-pointer hover:text-[#f3b15c]" onClick={() => navigate(`/product/${product.id}`)}>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1 cursor-pointer hover:text-[#f3b15c]" onClick={() => handleProductClick(product.id)}>
                   {product.name}
                 </h3>
 
@@ -140,7 +144,7 @@ const SearchPage = () => {
 
                 {/* Action Button */}
                 <button
-                  onClick={() => navigate(`/product/${product.id}`)}
+                  onClick={() => handleProductClick(product.id)}
                   className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
                 >
                   View Details
