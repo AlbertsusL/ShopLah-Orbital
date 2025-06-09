@@ -9,7 +9,7 @@ router.post('/',async(req, res) => {
         await db.query('BEGIN');
         const productQuery = `
         INSERT INTO products (name, userid, description, price, category, stock)
-        VALUES($1, $2, $3, $4, $5, $6)`;
+        VALUES($1, $2, $3, $4, $5, $6) RETURNING id`;
         const productResult = await db.query(productQuery,
             [name, userid, description, price, category, stock]
         );

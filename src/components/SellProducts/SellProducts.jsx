@@ -65,24 +65,24 @@ const AddProductPage = () => {
 
     try {
       const imageUrls = await uploadImages();
-      const response = await axios.post('/api/products', {
+      const response = await axios.post('api/products', {
         ...productData,
-        images: imageUrls,
+        images: imageUrls, 
         price: parseFloat(productData.price),
-        stock: parseInt(productData.stock),
+        stock:parseInt(productData.stock),
       });
-      setSuccessMessage('Product added successfully!');
+      setSuccessMessage("Product added successfully!");
       setProductData({
         name: '',
         description: '',
         price: '',
         category: '',
         stock: '',
-      });
+      })
       setImages([]);
       setImagePreviews([]);
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || 'Failed to list product');
+    }catch(error) {
+      setErrorMessage(error.response?.data?.message || 'Failed to add product');
     } finally {
       setIsLoading(false);
     }
@@ -207,7 +207,7 @@ const AddProductPage = () => {
                   value={productData.price}
                   onChange={handleInputChange}
                   required
-                  className= 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none'
+                  className= 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pl-10 focus:outline-none'
                 />
               </div>
             </div>
