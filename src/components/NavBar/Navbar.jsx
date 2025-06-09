@@ -41,20 +41,20 @@ const Navbar = () => {
   const handleBuyClick = (e) => {
     e.preventDefault();
     if (userDetails) {
-      navigate('/BuyProducts');
+      navigate('/buy/search');
     } else {
       toast.error("Please sign in to buy products");
-      navigate("/signin", { state: { from: '/BuyProducts' } });
+      navigate("/signin", { state: { from: '/buy/search' } });
     }
   };
 
   const handleSellClick = (e) => {
     e.preventDefault();
     if (userDetails) {
-      navigate('/SellProducts');
+      navigate('/sell');
     } else {
       toast.error("Please sign in to sell products");
-      navigate("/signin", { state: { from: '/SellProducts' } });
+      navigate("/signin", { state: { from: '/sell' } });
     }
   };
 

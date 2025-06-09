@@ -17,17 +17,13 @@ import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const location = useLocation();
-  const showSidebar = location.pathname === '/BuyProducts' || 
-                     location.pathname === '/SellProducts' ||
-                     location.pathname === '/search' ||
-                     location.pathname.startsWith('/product/');
+  const showSidebar = location.pathname.startsWith('/buy') || 
+                     location.pathname.startsWith('/sell');
 
   return (
     <div>
-      {(location.pathname === '/BuyProducts' || 
-        location.pathname === '/search' || 
-        location.pathname.startsWith('/product/')) && <BuySideNavbar />}
-      {location.pathname === '/SellProducts' && <SideNavbar />}
+      {location.pathname.startsWith('/buy') && <BuySideNavbar />}
+      {location.pathname.startsWith('/sell') && <SideNavbar />}
       <Navbar />
       
       {/* Different content based on URL */}
@@ -38,10 +34,15 @@ const App = () => {
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/sellproducts" element={<SellProducts />} />
-          <Route path="/buyproducts" element={<BuyProducts />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/search" element={<SearchPage />} />
+          
+          {/* Sell route */}
+          <Route path="/sell" element={<SellProducts />} />
+          
+          {/* Buy route */}
+          <Route path="/buy/search" element={<SearchPage />} />
+          <Route path="/buy/products" element={<BuyProducts />} />
+          <Route path="/buy/product/:id" element={<ProductDetail />} />
+          
           <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </div>
