@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
 import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../../firebase/firebase";
+import { toast } from "react-toastify";
+import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const AddProductPage = () => {
   const [productData, setProductData] = useState({
@@ -14,6 +18,32 @@ const AddProductPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const [userDetails, setUserDetails] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "Users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setUserDetails(docSnap.data());
+          }
+        } catch (error) {
+          console.error("User data load error:", error);
+          if (error.code !== "permission-denied") {
+            toast.error("Error loading user data");
+          }
+        }
+      } else {
+        setUserDetails(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -65,8 +95,12 @@ const AddProductPage = () => {
 
     try {
       const imageUrls = await uploadImages();
+      if(imageUrls.length === 0) {
+        throw new Error('At least 1 image is required');
+      }
       const response = await axios.post('api/products', {
         ...productData,
+        userid: userDetails.user,
         images: imageUrls, 
         price: parseFloat(productData.price),
         stock:parseInt(productData.stock),
@@ -94,7 +128,7 @@ const AddProductPage = () => {
       formData.append('images', image);
     });
 
-    const response = await axios.post('/api/upload', formData, {
+    const response = await axios.post('http://localhost:5000/api/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -103,20 +137,20 @@ const AddProductPage = () => {
     return response.data.imageUrls;
   };
   const buttonStyle = {
-  position: "absolute",
-  top: "0",
-  right: "0",
-  paddingTop:"10px",
-  transform: "translate(-50%, 30%)",
-  backgroundColor: "#ef4444",
-  color: "white",
-  borderRadius: "50%",
-  width: "32px", 
-  height: "32px", 
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "16px",
+    position: "absolute",
+    top: "0",
+    right: "0",
+    paddingTop:"10px",
+    transform: "translate(-50%, 30%)",
+    backgroundColor: "#ef4444",
+    color: "white",
+    borderRadius: "50%",
+    width: "32px", 
+    height: "32px", 
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "16px",
 };
 
   return (

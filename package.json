@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.826.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
@@ -17,7 +18,9 @@
     "aws-sdk": "^2.1692.0",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
+    "dot": "^1.1.3",
     "dotenv": "^16.5.0",
+    "env": "^0.0.2",
     "express": "^5.1.0",
     "firebase": "^11.8.1",
     "multer": "^2.0.1",
@@ -34,15 +37,33 @@
     "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/node": "^7.27.1",
+    "@babel/preset-react": "^7.27.1",
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
+    "esbuild": "^0.25.5",
+    "esbuild-runner": "^2.2.2",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "nodemon": "^3.1.10",
     "vite": "^6.3.5"
-  }
+  },
+  "description": "Team ID: 7563 Team Name: ShopLah  Brian Yeo Zheng Yu Albertus Frederick Ashali",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlbertsusL/ShopLah-Orbital.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlbertsusL/ShopLah-Orbital/issues"
+  },
+  "homepage": "https://github.com/AlbertsusL/ShopLah-Orbital#readme"
 }

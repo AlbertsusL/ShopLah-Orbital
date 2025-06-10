@@ -1,10 +1,15 @@
-const Pool = require('pg').Pool;
-const pool = new Pool({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database:process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
+import pg from 'pg';
+import env from 'dotenv';
+env.config();
+
+const database = new pg.Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'shoplah',
+    password: String(1122334455),
+    port: 5432,
 })
 
-module.exports = pool;
+database.connect();
+
+export const query = (text, params) => database.query(text, params);

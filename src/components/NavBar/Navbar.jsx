@@ -154,8 +154,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      
-      {/* Lower Navbar - Empty for now */}
     </div>
   );
 };

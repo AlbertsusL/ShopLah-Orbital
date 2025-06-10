@@ -1,8 +1,8 @@
-const express = require('express');
-const multer = require('multer');
+import express from 'express';
+import multer from 'multer';
 const router = express.Router();
-const {uploadToCloud} = require('../cloudStorage');
-const db = require('../../database');
+import uploadToCloud from '../cloudStorage/cloudStorage.js';
+import { query } from '../../../../database.js';
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -11,26 +11,27 @@ const upload = multer({
 
 router.post('/', upload.array('images', 5), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No image uploaded' });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'No image uploaded' });
     }
-    const imageUrl = await uploadToCloud(req.file);
+    const uploadPromises = req.files.map(file => uploadToCloud(file))
+    const imageUrls = await Promise.all(uploadPromises)
     const query = `
       INSERT INTO product_images (product_id, image_url, is_primary)
       VALUES ($1, $2, $3)
       RETURNING id
     `;
     
-    const result = await db.query(query, [
+    const result = await query(query, [
       req.body.productId, 
-      imageUrl, 
+      imageUrls, 
       req.body.isPrimary || false
     ]);
     
     res.json({
       success: true,
       imageId: result.rows[0].id,
-      imageUrl
+      imageUrls
     });
   } catch (error) {
     console.error('Upload error:', error);
@@ -41,4 +42,4 @@ router.post('/', upload.array('images', 5), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

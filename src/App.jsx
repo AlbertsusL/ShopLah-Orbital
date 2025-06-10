@@ -6,7 +6,7 @@ import ContactUsPage from "./components/MainPage/ContactUsPage.jsx";
 import SignInPage from "./components/LoginSignup/SignInPage.jsx";
 import SignUpPage from "./components/LoginSignup/SignUpPage.jsx";
 import Profile from "./components/ProfilePage/Profile.jsx";
-import SellProducts from "./components/SellProducts/sellProducts.jsx";
+import SellProducts from "./components/SellProducts/SellProducts.jsx";
 import BuyProducts from "./components/BuyProducts/BuyProducts.jsx";
 import SideNavbar from "./components/NavBar/SideNavbar.jsx";
 import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
