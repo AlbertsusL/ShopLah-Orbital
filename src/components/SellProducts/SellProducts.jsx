@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebase";
 import { toast } from "react-toastify";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 
 const AddProductPage = () => {
   const [productData, setProductData] = useState({
@@ -18,7 +17,6 @@ const AddProductPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
   const [userDetails, setUserDetails] = useState(null);
 
   useEffect(() => {
@@ -39,7 +37,6 @@ const AddProductPage = () => {
       } else {
         setUserDetails(null);
       }
-      setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -98,25 +95,29 @@ const AddProductPage = () => {
       if(imageUrls.length === 0) {
         throw new Error('At least 1 image is required');
       }
-      const response = await axios.post('api/products', {
+      
+      const response = await axios.post('http://localhost:5000/api/products', {
         ...productData,
-        userid: userDetails.user,
+        userid: userDetails?.ID || userDetails?.user,
         images: imageUrls, 
         price: parseFloat(productData.price),
-        stock:parseInt(productData.stock),
+        stock: parseInt(productData.stock),
       });
-      setSuccessMessage("Product added successfully!");
-      setProductData({
-        name: '',
-        description: '',
-        price: '',
-        category: '',
-        stock: '',
-      })
-      setImages([]);
-      setImagePreviews([]);
-    }catch(error) {
-      setErrorMessage(error.response?.data?.message || 'Failed to add product');
+      
+      if (response.data.success) {
+        setSuccessMessage("Product added successfully!");
+        setProductData({
+          name: '',
+          description: '',
+          price: '',
+          category: '',
+          stock: '',
+        });
+        setImages([]);
+        setImagePreviews([]);
+      }
+    } catch(error) {
+      setErrorMessage(error.response?.data?.message || error.message || 'Failed to add product');
     } finally {
       setIsLoading(false);
     }
@@ -136,6 +137,7 @@ const AddProductPage = () => {
 
     return response.data.imageUrls;
   };
+  
   const buttonStyle = {
     position: "absolute",
     top: "0",
@@ -338,7 +340,7 @@ const AddProductPage = () => {
           <button
             type='submit'
             disabled={isLoading || imagePreviews.length === 0}
-            className={`ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${(isLoading || imagePreviews.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-amber-500 to-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 ${(isLoading || imagePreviews.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {isLoading ? 'Adding Product...' : 'Add Product'}
           </button>

@@ -1,56 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import Image1 from "../../assets/phone.jpg";
-import Image2 from "../../assets/mouse.jpg";
-import Image3 from "../../assets/television.jpg";
+import axios from 'axios';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const SampleProducts = [
-    {
-        id: 1,
-        name: "iPhone 15 Pro",
-        price: 1299,
-        image: Image1,
-        rating: 4.8,
-        reviews: 234,
-        category: "Electronics",
-        description: "It's an iphone",
-        stock: 12,
+  // Fetch product from API
+  useEffect(() => {
+    fetchProduct();
+  }, [id]);
 
-    },
-    {
-        id: 2,
-        name: "Gaming Mouse",
-        price: 89,
-        image: Image2,
-        rating: 4.5,
-        reviews: 156,
-        category: "Peripherals",
-        description: "Yum",
-        stock: 25,
-    },
-    {
-        id: 3,
-        name: "Smart TV 55\"",
-        price: 799,
-        image: Image3,
-        rating: 4.6,
-        reviews: 89,
-        category: "Electronics",
-        description: "Ew",
-        stock: 0,
-    },
-  ];
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+      if (response.data.success) {
+        setProduct(response.data.product);
+      } else {
+        setError('Product not found');
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      if (error.response?.status === 404) {
+        setError('Product not found');
+      } else {
+        setError('Failed to load product');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const product = SampleProducts.find(p => p.id === parseInt(id));
-
-  const renderStars = (rating) => {
+  const renderStars = (rating = 4.5) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -89,6 +78,37 @@ const ProductDetail = () => {
     navigate('/buy/search');
   };
 
+  const getProductImages = () => {
+    if (product && product.images && product.images.length > 0) {
+      return product.images.map(img => img.image_url);
+    }
+    return ['https://via.placeholder.com/400x400?text=No+Image'];
+  };
+
+  const getCurrentImage = () => {
+    const images = getProductImages();
+    return images[selectedImageIndex] || images[0];
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <button 
+          onClick={handleBackToSearch}
+          className="mb-4 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+        >
+          ← Back to Search
+        </button>
+        <div className="text-center">
+          <div className="text-xl">Loading product...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const images = getProductImages();
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Back button */}
@@ -101,15 +121,39 @@ const ProductDetail = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        {/* Product Image */}
+        {/* Product Images */}
         <div>
+          {/* Main Image */}
           <img 
-            src={product.image} 
+            src={getCurrentImage()}
             alt={product.name}
-            className="w-full h-96 object-cover rounded-lg shadow-lg"
+            className="w-full h-96 object-cover rounded-lg shadow-lg mb-4"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/400x400?text=No+Image';
+            }}
           />
           
-
+          {/* Image Thumbnails */}
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`${product.name} ${index + 1}`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer transition-all ${
+                    selectedImageIndex === index 
+                      ? 'ring-2 ring-amber-500 opacity-100' 
+                      : 'opacity-70 hover:opacity-100'
+                  }`}
+                  onClick={() => setSelectedImageIndex(index)}
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Product Info */}
@@ -118,7 +162,7 @@ const ProductDetail = () => {
 
           {/* Category Badge */}
           <div className="flex items-center gap-2 mb-4">
-            <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+            <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm capitalize">
               {product.category}
             </span>
           </div>
@@ -126,17 +170,17 @@ const ProductDetail = () => {
           {/* Rating */}
           <div className="flex items-center gap-2 mb-4">
             <div className="flex items-center">
-              {renderStars(product.rating)}
+              {renderStars(4.5)}
             </div>
             <span className="text-sm text-gray-600">
-              {product.rating} ({product.reviews} reviews)
+              4.5 (New Product)
             </span>
           </div>
 
           {/* Price */}
           <div className="mb-4">
             <span className="text-3xl font-bold text-gray-800">
-              ${product.price}
+              ${parseFloat(product.price).toFixed(2)}
             </span>
           </div>
 
@@ -156,42 +200,52 @@ const ProductDetail = () => {
           {/* Description */}
           <div className="mb-6">
             <h3 className="font-semibold text-lg mb-2">Description</h3>
-            <p className="text-gray-700">{product.description}</p>
+            <p className="text-gray-700 leading-relaxed">{product.description}</p>
+          </div>
+
+          {/* Seller Info */}
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-gray-600">Sold by: {product.userid}</p>
           </div>
 
           {/* Quantity Selector */}
-          <div className="flex items-center gap-4 mb-6">
-            <label className="font-medium">Quantity:</label>
-            <select 
-              value={quantity} 
-              onChange={(e) => setQuantity(parseInt(e.target.value))}
-              className="border border-gray-300 rounded px-3 py-2"
-              disabled={product.stock === 0}
-            >
-              {[...Array(Math.min(product.stock, 10))].map((_, i) => (
-                <option key={i+1} value={i+1}>{i+1}</option>
-              ))}
-            </select>
-          </div>
+          {product.stock > 0 && (
+            <div className="flex items-center gap-4 mb-6">
+              <label className="font-medium">Quantity:</label>
+              <select 
+                value={quantity} 
+                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                className="border border-gray-300 rounded px-3 py-2"
+              >
+                {[...Array(Math.min(product.stock, 10))].map((_, i) => (
+                  <option key={i+1} value={i+1}>{i+1}</option>
+                ))}
+              </select>
+              <span className="text-gray-600">
+                Total: ${(product.price * quantity).toFixed(2)}
+              </span>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="space-y-3">
             <button
               onClick={handleBuyNow}
               disabled={product.stock === 0}
-              className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
             >
-              {product.stock === 0 ? 'Out of Stock' : `Buy Now`}
+              {product.stock === 0 ? 'Out of Stock' : `Buy Now - $${(product.price * quantity).toFixed(2)}`}
             </button>
             
             <button
               onClick={handleAddToCart}
               disabled={product.stock === 0}
-              className="w-full bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Add to Cart
             </button>
           </div>
+
         </div>
       </div>
     </div>

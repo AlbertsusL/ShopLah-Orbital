@@ -7,7 +7,6 @@ import SignInPage from "./components/LoginSignup/SignInPage.jsx";
 import SignUpPage from "./components/LoginSignup/SignUpPage.jsx";
 import Profile from "./components/ProfilePage/Profile.jsx";
 import SellProducts from "./components/SellProducts/SellProducts.jsx";
-import BuyProducts from "./components/BuyProducts/BuyProducts.jsx";
 import SideNavbar from "./components/NavBar/SideNavbar.jsx";
 import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
 import ProductDetail from "./components/BuyProducts/ProductDetail.jsx";
@@ -40,7 +39,6 @@ const App = () => {
           
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />
-          <Route path="/buy/products" element={<BuyProducts />} />
           <Route path="/buy/product/:id" element={<ProductDetail />} />
           
           <Route path="/checkout" element={<Checkout />} />

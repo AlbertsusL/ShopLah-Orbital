@@ -1,53 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
-import Image1 from "../../assets/phone.jpg";
-import Image2 from "../../assets/mouse.jpg";
-import Image3 from "../../assets/television.jpg";
+import axios from 'axios';
 
 const SearchPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const AllProducts = [
-    {
-        id: 1,
-        name: "iPhone 15 Pro",
-        price: 1299,
-        image: Image1,
-        rating: 4.8,
-        reviews: 234,
-        category: "Electronics",
-    },
-    {
-        id: 2,
-        name: "Gaming Mouse",
-        price: 89,
-        image: Image2,
-        rating: 4.5,
-        reviews: 156,
-        category: "Peripherals",
-    },
-    {
-        id: 3,
-        name: "Smart TV 55\"",
-        price: 799,
-        image: Image3,
-        rating: 4.6,
-        reviews: 89,
-        category: "Electronics",
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/products');
+      if (response.data.success) {
+        setProducts(response.data.products);
+      } else {
+        setError('Failed to fetch products');
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setError('Failed to fetch products');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const filteredProducts = AllProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = searchTerm === '' || 
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || product.category === categoryFilter;
     
     return matchesSearch && matchesCategory;
   });
 
-  const renderStars = (rating) => {
+  const renderStars = (rating = 4.5) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -72,6 +66,40 @@ const SearchPage = () => {
     navigate(`/buy/product/${productId}`);
   };
 
+  const getProductImage = (product) => {
+    if (product.images && product.images.length > 0) {
+      const primaryImage = product.images.find(img => img.is_primary);
+      return primaryImage ? primaryImage.image_url : product.images[0].image_url;
+    }
+    return 'https://via.placeholder.com/300x200?text=No+Image';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-xl">Loading products...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-red-600 text-xl">{error}</div>
+          <button 
+            onClick={fetchProducts}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
@@ -95,64 +123,102 @@ const SearchPage = () => {
               className="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#f3b15c]"
             >
               <option value="">All Categories</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Peripherals">Peripherals</option>
+              <option value="electronics">Electronics</option>
+              <option value="clothing">Clothing</option>
+              <option value="home">Home & Garden</option>
+              <option value="books">Books</option>
+              <option value="toys">Toys</option>
             </select>
+            
+            <button
+              onClick={fetchProducts}
+              className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-4 py-2 rounded hover:opacity-90"
+            >
+              Refresh
+            </button>
           </div>
         </div>
 
-        {/* Products Grid*/}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-              
-              {/* Product Image */}
-              <div className="relative overflow-hidden cursor-pointer" onClick={() => handleProductClick(product.id)}>
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                {/* Category Badge */}
-                <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs">
-                  {product.category}
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1 cursor-pointer hover:text-[#f3b15c]" onClick={() => handleProductClick(product.id)}>
-                  {product.name}
-                </h3>
-
-                {/* Rating */}
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center">
-                    {renderStars(product.rating)}
-                  </div>
-                  <span className="text-sm text-gray-600">
-                    {product.rating} ({product.reviews} reviews)
-                  </span>
-                </div>
-
-                {/* Price */}
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl font-bold text-gray-800">
-                    ${product.price}
-                  </span>
-                </div>
-
-                {/* Action Button */}
-                <button
-                  onClick={() => handleProductClick(product.id)}
-                  className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
+        {/* Products Count */}
+        <div className="mb-4">
+          <p className="text-gray-600">
+            Showing {filteredProducts.length} of {products.length} products
+          </p>
         </div>
+
+        {/* Products Grid */}
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600 text-lg">No products found</p>
+            {products.length === 0 && (
+              <p className="text-gray-500 mt-2">Try adding some products first!</p>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProducts.map((product) => (
+              <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                
+                {/* Product Image */}
+                <div className="relative overflow-hidden cursor-pointer" onClick={() => handleProductClick(product.id)}>
+                  <img 
+                    src={getProductImage(product)}
+                    alt={product.name}
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                    }}
+                  />
+                  {/* Category Badge */}
+                  <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs capitalize">
+                    {product.category}
+                  </div>
+                  {/* Stock Badge */}
+                  {product.stock === 0 && (
+                    <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                      Out of Stock
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Info */}
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1 cursor-pointer hover:text-[#f3b15c]" onClick={() => handleProductClick(product.id)}>
+                    {product.name}
+                  </h3>
+
+                  {/* Rating */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center">
+                      {renderStars(4.5)}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      4.5 (New)
+                    </span>
+                  </div>
+
+                  {/* Price */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl font-bold text-gray-800">
+                      ${product.price}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Stock: {product.stock}
+                    </span>
+                  </div>
+
+                  {/* Action Button */}
+                  <button
+                    onClick={() => handleProductClick(product.id)}
+                    className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
