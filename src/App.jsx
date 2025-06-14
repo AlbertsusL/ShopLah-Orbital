@@ -12,6 +12,7 @@ import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
 import ProductDetail from "./components/BuyProducts/ProductDetail.jsx";
 import SearchPage from "./components/BuyProducts/SearchPage.jsx";
 import Checkout from "./components/BuyProducts/Checkout.jsx";
+import ManageProducts from "./components/SellProducts/ManageProducts.jsx"
 import { ToastContainer } from "react-toastify";
 
 const App = () => {
@@ -36,6 +37,7 @@ const App = () => {
           
           {/* Sell route */}
           <Route path="/sell" element={<SellProducts />} />
+          <Route path="/sell/manage" element={<ManageProducts />} />
           
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />

@@ -2,6 +2,49 @@ import express from 'express';
 const router = express.Router();
 import { query } from '../database.js';
 
+router.get('/user/:userid', async (req, res) => {
+  try {
+        const { userid } = req.params;
+        if (typeof userid !== 'string' || userid.length !== 28) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid user ID format' 
+            });
+    }   
+        const result = await query(`
+            SELECT p.*, 
+                   COALESCE(
+                     json_agg(
+                       json_build_object(
+                         'id', pi.id,
+                         'image_url', pi.image_url,
+                         'is_primary', pi.is_primary
+                       ) ORDER BY pi.is_primary DESC, pi.id
+                     ) FILTER (WHERE pi.id IS NOT NULL), 
+                     '[]'
+                   ) as images
+            FROM products p
+            LEFT JOIN product_images pi ON p.id = pi.product_id
+            WHERE p.userid = $1
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
+        `, [userid]);
+        res.json({ success: true, products: result.rows });
+    } catch (error) {
+        console.error('Database error:', {
+        message: error.message,
+        query: error.query,
+        parameters: error.parameters
+    });
+    res.status(500).json({ 
+        success: false, 
+        message: 'Database operation failed',
+        error: error.message 
+    });
+  }
+});
+
+
 router.get('/', async (req, res) => {
     try {
         const queryText = `

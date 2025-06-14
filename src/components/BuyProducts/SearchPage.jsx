@@ -104,7 +104,7 @@ const SearchPage = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Browse Products</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Browse Products</h1>
         
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg shadow-md mb-6">

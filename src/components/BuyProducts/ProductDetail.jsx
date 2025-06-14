@@ -96,7 +96,7 @@ const ProductDetail = () => {
       <div className="container mx-auto px-4 py-8">
         <button 
           onClick={handleBackToSearch}
-          className="mb-4 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+          className="mb-4 text-white flex items-center gap-2"
         >
           ← Back to Search
         </button>
@@ -114,7 +114,7 @@ const ProductDetail = () => {
       {/* Back button */}
       <button 
         onClick={handleBackToSearch}
-        className="mb-4 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+        className="mb-4 text-white flex items-center gap-2"
       >
         ← Back to Search
       </button>
