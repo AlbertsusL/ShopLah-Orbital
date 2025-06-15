@@ -39,6 +39,12 @@ const ManageProducts = () => {
         return () => unsubscribe();
     }, []);
 
+    useEffect(() => {
+        if (userDetails && userDetails.ID) {
+            fetchProducts();
+        }
+    },[userDetails]);
+
     const fetchProducts = async () => {
         try {
             setLoading(true);
@@ -84,13 +90,15 @@ const ManageProducts = () => {
         navigate(`/modify/product/${id}`);
     };
 
-    const handleDelete = async () => {
+    const handleDelete = async (productId) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
                 setLoading(true);
-                const response = await axios.delete(`http://localhost:5000/api/products/user/${userDetails.ID}`);
+                const response = await axios.delete(`http://localhost:5000/api/products/delete/${productId}`, {
+                    productId:productId,
+                });
                 if (response.data.success) {
-                    setProducts(products.filter(product => product.id !== id));
+                    fetchProducts();
                 } else {
                     throw new Error(response.data.message || 'Failed to delete product');
                 }

@@ -147,4 +147,25 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.delete('/delete/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+        console.log('Product ID:', productId);
+        const queryTextProduct = `DELETE FROM products WHERE id = $1`;
+        const queryTextImage = `DELETE FROM product_images WHERE product_id = $1`;
+        await query(queryTextImage, [productId]);
+        await query(queryTextProduct, [productId]);
+        res.status(200).json({
+            success:true,
+            message: 'Product deleted successfully',
+        });
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        res.status(500).json({
+            success:false,
+            message:'Failed to delete product',
+        });
+    }
+})
+
 export default router;
