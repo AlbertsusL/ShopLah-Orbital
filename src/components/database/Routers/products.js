@@ -108,6 +108,33 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.put('/modify/:id', async (req, res) => {
+    const {description, price, stock, id} = req.body;
+    try {
+        const queryText= `
+        UPDATE products 
+        SET 
+            description = $1,
+            price = $2,
+            stock = $3
+        WHERE id = $4 
+        RETURNING *`;
+        const result = await query(queryText, 
+            [description, price, stock, id]);
+        res.status(201).json({
+            success: true,
+            message: "Product updated successfully",
+            product: result.rows[0]
+        });
+    } catch (error) {
+        console.error("Error updating product:", error);
+        res.status(500).json({
+            success:false,
+            message:'Failed to update product',
+        });
+    }
+})
+
 router.post('/', async (req, res) => {
     const { name, userid, description, price, category, stock, images } = req.body;
 

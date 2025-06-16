@@ -3,6 +3,8 @@ import axios from 'axios';
 import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate,useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 const ManageProducts = () => {
     const [userDetails, setUserDetails] = useState(null);
@@ -87,7 +89,7 @@ const ManageProducts = () => {
     };
 
     const handleModify = (id) => {
-        navigate(`/modify/product/${id}`);
+        navigate(`/sell/modify/${id}`);
     };
 
     const handleDelete = async (productId) => {
@@ -98,6 +100,7 @@ const ManageProducts = () => {
                     productId:productId,
                 });
                 if (response.data.success) {
+                    toast.success("Product successfully deleted!");
                     fetchProducts();
                 } else {
                     throw new Error(response.data.message || 'Failed to delete product');
@@ -251,7 +254,7 @@ const ManageProducts = () => {
                                                 onClick={() => handleModify(product.id)}
                                                 className="text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                                             >
-                                                Edit
+                                                Modify
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
