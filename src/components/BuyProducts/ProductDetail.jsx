@@ -3,40 +3,36 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [seller, setSeller] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  // Fetch product from API
   useEffect(() => {
     fetchProduct();
   }, [id]);
 
   const fetchProduct = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/products/${id}`);
-      if (response.data.success) {
-        setProduct(response.data.product);
-      } else {
-        setError('Product not found');
-      }
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      if (error.response?.status === 404) {
-        setError('Product not found');
-      } else {
-        setError('Failed to load product');
-      }
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+    const productData = response.data.product;
+    setProduct(productData);
+    
+    await fetchSellerInfo(productData.userid);
+    setLoading(false);
+  };
+
+  const fetchSellerInfo = async (userId) => {
+    const docRef = doc(db, "Users", userId);
+    const docSnap = await getDoc(docRef);
+    setSeller(docSnap.data());
   };
 
   const renderStars = (rating = 4.5) => {
@@ -90,7 +86,6 @@ const ProductDetail = () => {
     return images[selectedImageIndex] || images[0];
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -205,7 +200,9 @@ const ProductDetail = () => {
 
           {/* Seller Info */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">Sold by: {product.userid}</p>
+            <p className="text-gray-600">
+              Sold by: {seller?.user}
+            </p>
           </div>
 
           {/* Quantity Selector */}
