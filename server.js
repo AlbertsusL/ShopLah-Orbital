@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import productRoutes from './src/components/database/Routers/products.js';
 import imageRoutes from './src/components/database/Routers/image.js';
+import ordersRouter from './src/components/database/Routers/orders.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/upload', imageRoutes);
+app.use('/api/orders', ordersRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
