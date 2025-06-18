@@ -15,10 +15,11 @@ const Checkout = () => {
     phone: ''
   });
 
-const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleCheckout = async (e) => {
     e.preventDefault();
+    
     if (!customerInfo.name || !customerInfo.email || !customerInfo.address) {
       toast.error('Please fill in all information');
       return;
@@ -67,13 +68,14 @@ const [loading, setLoading] = useState(false);
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Your Information</h2>
             
-            <form className="space-y-4">
+            <form onSubmit={handleCheckout} className="space-y-4">
               <input
                 type="text"
                 placeholder="Your Name"
                 value={customerInfo.name}
                 onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
                 className="w-full border border-gray-300 rounded px-3 py-2"
+                required
               />
               
               <input
@@ -82,6 +84,7 @@ const [loading, setLoading] = useState(false);
                 value={customerInfo.email}
                 onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
                 className="w-full border border-gray-300 rounded px-3 py-2"
+                required
               />
               
               <input
@@ -97,6 +100,7 @@ const [loading, setLoading] = useState(false);
                 value={customerInfo.address}
                 onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
                 className="w-full border border-gray-300 rounded px-3 py-2 h-20"
+                required
               />
               
               <button 
