@@ -12,7 +12,8 @@ import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
 import ProductDetail from "./components/BuyProducts/ProductDetail.jsx";
 import SearchPage from "./components/BuyProducts/SearchPage.jsx";
 import Checkout from "./components/BuyProducts/Checkout.jsx";
-import ManageProducts from "./components/SellProducts/ManageProducts.jsx"
+import ManageProducts from "./components/SellProducts/ManageProducts.jsx";
+import ModifyProducts from "./components/SellProducts/ModifyProducts.jsx";
 import { ToastContainer } from "react-toastify";
 
 const App = () => {
@@ -24,10 +25,10 @@ const App = () => {
     <div>
       {location.pathname.startsWith('/buy') && <BuySideNavbar />}
       {location.pathname.startsWith('/sell') && <SideNavbar />}
-      <Navbar />
+      <Navbar style={{ position: 'sticky', top: 0, zIndex: 1000000000}} />
       
       {/* Different content based on URL */}
-      <div className={showSidebar ? "ml-64" : ""}>
+      <div className={showSidebar ? "ml-64" : "content"}>
         <Routes>
           <Route path="/" element={<MainPageView />} />
           <Route path="/contactuspage" element={<ContactUsPage />} />
@@ -38,6 +39,7 @@ const App = () => {
           {/* Sell route */}
           <Route path="/sell" element={<SellProducts />} />
           <Route path="/sell/manage" element={<ManageProducts />} />
+          <Route path='/sell/modify/:id' element={<ModifyProducts />} />
           
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />
