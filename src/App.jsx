@@ -25,10 +25,10 @@ const App = () => {
     <div>
       {location.pathname.startsWith('/buy') && <BuySideNavbar />}
       {location.pathname.startsWith('/sell') && <SideNavbar />}
-      <Navbar />
+      <Navbar style={{ position: 'sticky', top: 0, zIndex: 1000000000}} />
       
       {/* Different content based on URL */}
-      <div className={showSidebar ? "ml-64" : ""}>
+      <div className={showSidebar ? "ml-64" : "content"}>
         <Routes>
           <Route path="/" element={<MainPageView />} />
           <Route path="/contactuspage" element={<ContactUsPage />} />

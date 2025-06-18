@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axios from 'axios';
+
 
 const Checkout = () => {
   const location = useLocation();
@@ -14,22 +16,28 @@ const Checkout = () => {
     phone: ''
   });
 
-  const [isProcessing, setIsProcessing] = useState(false);
+const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleCheckout = async (e) => {
     e.preventDefault();
-    
     if (!customerInfo.name || !customerInfo.email || !customerInfo.address) {
       toast.error('Please fill in all information');
       return;
     }
-
-    setIsProcessing(true);
-    
-    setTimeout(() => {
-      toast.success('Order placed successfully!');
-      navigate('/profile');
-    }, 2000);
+    setLoading(true);
+    try {
+        await axios.put(`http://localhost:5000/api/products/checkout/${orderData.product.id}`, {
+            stock: orderData.quantity,
+            id: orderData.product.id,
+        });
+        toast.success('Checkout successfully');
+        navigate('/buy/search');
+    } catch (error) {
+        toast.error("Failed to Checkout");
+        console.error('Error', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const finalTotal = orderData.total;
@@ -45,7 +53,7 @@ const Checkout = () => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form className="space-y-4">
               <input
                 type="text"
                 placeholder="Full Name"
@@ -82,10 +90,11 @@ const Checkout = () => {
               
               <button 
                 type="submit"
-                disabled={isProcessing}
+                onClick={handleCheckout}
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
               >
-                {isProcessing ? 'Processing...' : `Place Order - $${finalTotal.toFixed(2)}`}
+                Place Order - $${finalTotal.toFixed(2)}
               </button>
             </form>
           </div>

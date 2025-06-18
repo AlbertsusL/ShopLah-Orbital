@@ -79,7 +79,7 @@ function MainPageView() {
     };
 
     return (
-        <div className='min-h-screen bg-gray-50'>
+        <div className='min-h-screen bg-gray-50' style={{ position: 'relative', zIndex: '-1'}}>
             {/* Hero Slider Section */}
             <div className='container'>
                 <div className="overflow-hidden rounded-3xl min-h-[300px]

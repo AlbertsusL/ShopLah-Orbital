@@ -135,6 +135,31 @@ router.put('/modify/:id', async (req, res) => {
     }
 })
 
+router.put('/checkout/:id', async (req, res) => {
+    const {stock, id} = req.body;
+    try {
+        const queryText= `
+        UPDATE products 
+        SET 
+            stock = stock - $1
+        WHERE id = $2
+        RETURNING *`;
+        const result = await query(queryText, 
+            [stock, id]);
+        res.status(201).json({
+            success: true,
+            message: "Product checked out successfully",
+            product: result.rows[0]
+        });
+    } catch (error) {
+        console.error("Error checking out:", error);
+        res.status(500).json({
+            success:false,
+            message:'Error checking out',
+        });
+    }
+})
+
 router.post('/', async (req, res) => {
     const { name, userid, description, price, category, stock, images } = req.body;
 
