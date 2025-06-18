@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -24,19 +23,34 @@ const [loading, setLoading] = useState(false);
       toast.error('Please fill in all information');
       return;
     }
-    setLoading(true);
+
+    setIsProcessing(true);
+    
     try {
-        await axios.put(`http://localhost:5000/api/products/checkout/${orderData.product.id}`, {
-            stock: orderData.quantity,
-            id: orderData.product.id,
-        });
-        toast.success('Checkout successfully');
-        navigate('/buy/search');
+      const orderInfo = {
+        productId: orderData.product.id,
+        quantity: orderData.quantity,
+        buyerName: customerInfo.name,
+        buyerEmail: customerInfo.email,
+        buyerAddress: customerInfo.address,
+        buyerPhone: customerInfo.phone,
+        total: orderData.total
+      };
+
+      const response = await axios.post('http://localhost:5000/api/orders', orderInfo);
+      
+      if (response.data.success) {
+        toast.success('Order placed successfully!');
+        toast.info('Emails sent to you and seller!');
+        navigate('/profile');
+      } else {
+        toast.error('Order failed!');
+      }
     } catch (error) {
-        toast.error("Failed to Checkout");
-        console.error('Error', error);
+      toast.error('Failed to place order');
+      console.error('Error:', error);
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
     }
   };
 
@@ -51,25 +65,23 @@ const [loading, setLoading] = useState(false);
           
           {/* Customer Form */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
+            <h2 className="text-xl font-semibold mb-4">Your Information</h2>
             
             <form className="space-y-4">
               <input
                 type="text"
-                placeholder="Full Name"
+                placeholder="Your Name"
                 value={customerInfo.name}
                 onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#f3b15c]"
-                required
+                className="w-full border border-gray-300 rounded px-3 py-2"
               />
               
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="Your Email"
                 value={customerInfo.email}
                 onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#f3b15c]"
-                required
+                className="w-full border border-gray-300 rounded px-3 py-2"
               />
               
               <input
@@ -77,53 +89,55 @@ const [loading, setLoading] = useState(false);
                 placeholder="Phone Number"
                 value={customerInfo.phone}
                 onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#f3b15c]"
+                className="w-full border border-gray-300 rounded px-3 py-2"
               />
               
               <textarea
-                placeholder="Shipping Address"
+                placeholder="Your Address"
                 value={customerInfo.address}
                 onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2 h-20 focus:ring-2 focus:ring-[#f3b15c]"
-                required
+                className="w-full border border-gray-300 rounded px-3 py-2 h-20"
               />
               
               <button 
                 type="submit"
-                onClick={handleCheckout}
-                disabled={loading}
+                disabled={isProcessing}
                 className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
               >
-                Place Order - $${finalTotal.toFixed(2)}
+                {isProcessing ? 'Processing...' : `Buy Now - $${finalTotal.toFixed(2)}`}
               </button>
             </form>
           </div>
 
           {/* Order Summary */}
-          <div className="bg-white p-6 rounded-lg shadow-md h-fit">
-            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Your Order</h2>
             
-            {/* Product */}
             <div className="flex gap-4 mb-4">
               <img 
-                src={orderData.product.image} 
+                src={orderData.product.images && orderData.product.images.length > 0 ? orderData.product.images[0].image_url : 'https://via.placeholder.com/64x64'} 
                 alt={orderData.product.name}
                 className="w-16 h-16 object-cover rounded"
               />
               <div>
                 <h3 className="font-medium">{orderData.product.name}</h3>
-                <p className="text-gray-600">Category: {orderData.product.category}</p>
-                <p className="text-gray-600">Qty: {orderData.quantity}</p>
+                <p className="text-gray-600">Quantity: {orderData.quantity}</p>
                 <p className="font-semibold">${orderData.product.price}</p>
               </div>
             </div>
             
             <hr className="my-4" />
             
-            {/* Pricing */}
-            <div className="space-y-2">
+            <div className="flex justify-between">
               <span>Total:</span>
-              <span>${finalTotal.toFixed(2)}</span>
+              <span className="font-bold">${finalTotal.toFixed(2)}</span>
+            </div>
+
+            <div className="mt-4 p-3 bg-blue-50 rounded">
+              <p className="text-sm">📧 After you buy:</p>
+              <p className="text-sm">• You get confirmation email</p>
+              <p className="text-sm">• Seller gets order details</p>
+              <p className="text-sm">• Delivery in 2 days</p>
             </div>
           </div>
         </div>
