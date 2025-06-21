@@ -14,13 +14,16 @@ import SearchPage from "./components/BuyProducts/SearchPage.jsx";
 import Checkout from "./components/BuyProducts/Checkout.jsx";
 import ManageProducts from "./components/SellProducts/ManageProducts.jsx";
 import ModifyProducts from "./components/SellProducts/ModifyProducts.jsx";
+import Payment from "./components/BuyProducts/Payment.jsx";
 import { ToastContainer } from "react-toastify";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
 const App = () => {
   const location = useLocation();
   const showSidebar = location.pathname.startsWith('/buy') || 
                      location.pathname.startsWith('/sell');
-
+  const stripePromise = loadStripe("pk_test_51RcLk9Fx0Ih7WgJ9LKuLhVMdhepeYdn5xxn0gdSxd7MOE15xNOBomgShv8TUsOshvsVpSVE3A2RRKGALwAQpjx4k00xQDG3e5s");
   return (
     <div>
       {location.pathname.startsWith('/buy') && <BuySideNavbar />}
@@ -44,7 +47,12 @@ const App = () => {
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />
           <Route path="/buy/product/:id" element={<ProductDetail />} />
-          
+          <Route path="/payment" element={
+            <Elements stripe={stripePromise}>
+              <Payment />
+            </Elements>
+          }
+        />
           <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </div>

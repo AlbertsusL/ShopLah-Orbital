@@ -4,21 +4,35 @@ import { query } from '../database.js';
 import { sendEmailToSeller, sendEmailToBuyer } from '../EmailService.js';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase.js';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import {Stripe} from "stripe";
+
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 router.post('/', async (req, res) => {
-    const orderData = req.body;
+    const {productId,
+          quantity,
+          total,
+          buyerName,
+          buyerEmail,
+          buyerAddress,
+          buyerPhone,
+          sellerId} = req.body;
 
     {/* Get Product Info */}
-    const productResult = await query('SELECT * FROM products WHERE id = $1', [orderData.productId]);
+    const productResult = await query('SELECT * FROM products WHERE id = $1', [productId]);
     const product = productResult.rows[0];
 
     {/* Check if enough stock */}
-    if (product.stock < orderData.quantity) {
+    if (product.stock < quantity) {
         return res.json({ success: false, message: 'Not enough stock' });
     }
 
     {/* Reduce Stock */}
-    await query('UPDATE products SET stock = stock - $1 WHERE id = $2', [orderData.quantity, orderData.productId]);
+    await query('UPDATE products SET stock = stock - $1 WHERE id = $2', [quantity, productId]);
 
     {/* Store order */}
     const orderQuery = `
@@ -28,14 +42,14 @@ router.post('/', async (req, res) => {
     `;
     
     const orderResult = await query(orderQuery, [
-        orderData.productId,
-        product.userid,
-        orderData.buyerName,
-        orderData.buyerEmail,
-        orderData.buyerAddress,
-        orderData.buyerPhone,
-        orderData.quantity,
-        orderData.total,
+        productId,
+        sellerId,
+        buyerName,
+        buyerEmail,
+        buyerAddress,
+        buyerPhone,
+        quantity,
+        total,
         'pending'
     ]);
 
@@ -57,13 +71,13 @@ router.post('/', async (req, res) => {
 
     {/* Send Emails */}
     const emailInfo = {
-        buyerName: orderData.buyerName,
-        buyerEmail: orderData.buyerEmail,
-        buyerAddress: orderData.buyerAddress,
-        buyerPhone: orderData.buyerPhone,
+        buyerName: buyerName,
+        buyerEmail: buyerEmail,
+        buyerAddress: buyerAddress,
+        buyerPhone: buyerPhone,
         productName: product.name,
-        quantity: orderData.quantity,
-        total: orderData.total,
+        quantity: quantity,
+        total: total,
         sellerEmail: sellerEmail
     };
 
@@ -77,4 +91,19 @@ router.post('/', async (req, res) => {
     });
 });
 
+router.post("/create-payment-intent", async (req, res) => {
+  const { total } = req.body;
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: total * 100, // Convert to cents
+      currency: "sgd",
+    });
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Payment failed");
+  }
+});
 export default router;
