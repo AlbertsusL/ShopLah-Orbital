@@ -14,7 +14,8 @@ import SearchPage from "./components/BuyProducts/SearchPage.jsx";
 import Checkout from "./components/BuyProducts/Checkout.jsx";
 import ManageProducts from "./components/SellProducts/ManageProducts.jsx";
 import ModifyProducts from "./components/SellProducts/ModifyProducts.jsx";
-import Payment from "./components/BuyProducts/Payment.jsx";
+import ManageAccount from "./components/SellProducts/ManageAccount.jsx";
+import Payment from "./components/BuyProducts/payment.jsx";
 import { ToastContainer } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -28,7 +29,7 @@ const App = () => {
     <div>
       {location.pathname.startsWith('/buy') && <BuySideNavbar />}
       {location.pathname.startsWith('/sell') && <SideNavbar />}
-      <Navbar style={{ position: 'sticky', top: 0, zIndex: 1000000000}} />
+      <Navbar style={{ position: 'sticky', top: 0, zIndex: 1}} />
       
       {/* Different content based on URL */}
       <div className={showSidebar ? "ml-64" : "content"}>
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/sell" element={<SellProducts />} />
           <Route path="/sell/manage" element={<ManageProducts />} />
           <Route path='/sell/modify/:id' element={<ModifyProducts />} />
+          <Route path='/sell/account' element={<ManageAccount />} />
           
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />

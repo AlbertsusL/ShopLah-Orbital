@@ -2,6 +2,56 @@ import express from 'express';
 const router = express.Router();
 import { query } from '../database.js';
 
+router.get('/order/:userid', async (req, res) => {
+    try {
+        const {userid} = req.params;
+        if (typeof userid !== 'string' || userid.length !== 28) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid user ID format' 
+            });
+        }
+        const result = await query (
+            `SELECT 
+                products.name AS name,
+                orders.total AS total,
+                DATE(orders.created_at) as date,
+                orders.status AS status
+            FROM 
+                orders
+            INNER JOIN 
+                products
+            ON 
+                orders.product_id = products.id
+            WHERE
+                orders.seller_id = $1`, [userid]
+        )
+        const sumQuery = await query(`
+            SELECT 
+                SUM(orders.total) AS total_sum
+            FROM 
+                orders
+            WHERE
+                orders.seller_id = $1 AND orders.status = 'pending'
+        `, [userid]);
+        const revenueQuery = await query(`
+            SELECT 
+                SUM(orders.total) AS total_sum
+            FROM 
+                orders
+            WHERE
+                orders.seller_id = $1 AND orders.status = 'delivered'
+        `, [userid]);
+        res.json({ 
+            success: true, 
+            order: result.rows, 
+            totalSum: sumQuery.rows[0].total_sum || 0,
+            revenueSum: revenueQuery.rows[0].total_sum || 0});
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch orders' });
+    }
+})
 router.get('/user/:userid', async (req, res) => {
   try {
         const { userid } = req.params;
@@ -10,7 +60,7 @@ router.get('/user/:userid', async (req, res) => {
                 success: false, 
                 message: 'Invalid user ID format' 
             });
-    }   
+        }   
         const result = await query(`
             SELECT p.*, 
                    COALESCE(
