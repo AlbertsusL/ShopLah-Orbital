@@ -33,7 +33,7 @@ const Checkout = () => {
         buyerAddress: customerInfo.address,
         buyerPhone: customerInfo.phone,
         total: orderData.total,
-        sellerId: orderData.sellerId,
+        sellerId: orderData.product.userid,
       }
     });
 

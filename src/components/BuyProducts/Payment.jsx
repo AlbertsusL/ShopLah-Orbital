@@ -42,7 +42,7 @@ const PaymentForm = ({ clientSecret }) => {
                 line1: buyerAddress?.line1 || "",
                 city: buyerAddress?.city || "",
                 postal_code: buyerAddress?.postalCode || "",
-                country: buyerAddress?.country || "US"
+                country: buyerAddress?.country || "SG"
               }
             }
           }
