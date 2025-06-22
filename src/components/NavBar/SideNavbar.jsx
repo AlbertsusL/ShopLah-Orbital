@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDollarSign, faList, faChartSimple, faBarsProgress } from '@fortawesome/free-solid-svg-icons';
+import { faDollarSign, faList, faChartSimple, faBarsProgress, faHandshake } from '@fortawesome/free-solid-svg-icons';
 
 const SideNavbar = () => {
   const location = useLocation();
@@ -42,7 +42,21 @@ const SideNavbar = () => {
           <span className="font-medium">Manage Products</span>
         </Link>
       </div>
-      
+
+      <div className="p-2">
+        <Link
+          to="/sell/manageorders"
+          className={`flex items-center p-3 rounded-lg transition-colors ${
+            location.pathname === '/sell/manageorders' 
+              ? 'bg-amber-200 text-amber-900' 
+              : 'text-amber-800 hover:bg-amber-100'
+          }`}
+        >
+          <FontAwesomeIcon icon={faHandshake} size="lg" className='mr-2'/> 
+          <span className="font-medium">Manage Orders</span>
+        </Link>
+      </div>
+
       <div className="p-2">
         <Link
           to="/sell/dashboard"
