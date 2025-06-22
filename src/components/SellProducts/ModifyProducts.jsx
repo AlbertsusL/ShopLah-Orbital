@@ -12,7 +12,6 @@ const ModifyProducts = () => {
   const [error, setError] = useState('');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  // Fetch product from API
   useEffect(() => {
     fetchProduct();
   }, [id]);

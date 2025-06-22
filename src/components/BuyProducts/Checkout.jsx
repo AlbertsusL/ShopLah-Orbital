@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 
 const Checkout = () => {
   const location = useLocation();
@@ -25,37 +24,20 @@ const Checkout = () => {
       return;
     }
 
-    setIsProcessing(true);
-    
-    try {
-      const orderInfo = {
+    navigate('/payment', {
+      state: {
         productId: orderData.product.id,
         quantity: orderData.quantity,
         buyerName: customerInfo.name,
         buyerEmail: customerInfo.email,
         buyerAddress: customerInfo.address,
         buyerPhone: customerInfo.phone,
-        total: orderData.total
-      };
-
-      const response = await axios.post('http://localhost:5000/api/orders', orderInfo);
-      
-      if (response.data.success) {
-        toast.success('Order placed successfully!');
-        toast.info('Emails sent to you and seller!');
-        navigate('/profile');
-      } else {
-        toast.error('Order failed!');
+        total: orderData.total,
+        sellerId: orderData.sellerId,
       }
-    } catch (error) {
-      toast.error('Failed to place order');
-      console.error('Error:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+    });
 
-  const finalTotal = orderData.total;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -108,7 +90,7 @@ const Checkout = () => {
                 disabled={isProcessing}
                 className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
               >
-                {isProcessing ? 'Processing...' : `Buy Now - $${finalTotal.toFixed(2)}`}
+                {isProcessing ? 'Processing...' : `Buy Now - $${orderData.total.toFixed(2)}`}
               </button>
             </form>
           </div>
@@ -134,7 +116,7 @@ const Checkout = () => {
             
             <div className="flex justify-between">
               <span>Total:</span>
-              <span className="font-bold">${finalTotal.toFixed(2)}</span>
+              <span className="font-bold">${orderData.total.toFixed(2)}</span>
             </div>
 
             <div className="mt-4 p-3 bg-blue-50 rounded">
