@@ -32,7 +32,7 @@ const BuySideNavbar = () => {
       {/* Delivery Tracking */}
       <div className="p-2">
         <Link
-          to="/buy/orders"
+          to="/buy/myorders"
           className="flex items-center p-3 rounded-lg transition-colors text-amber-800 hover:bg-amber-100"
         >
           <FontAwesomeIcon icon={faTruck} size="lg" className='mr-2'/> 

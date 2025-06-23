@@ -10,12 +10,14 @@ import SellProducts from "./components/SellProducts/SellProducts.jsx";
 import SideNavbar from "./components/NavBar/SideNavbar.jsx";
 import BuySideNavbar from "./components/NavBar/BuySideNavBar.jsx";
 import ProductDetail from "./components/BuyProducts/ProductDetail.jsx";
+import MyOrders from "./components/BuyProducts/MyOrders.jsx";
 import SearchPage from "./components/BuyProducts/SearchPage.jsx";
 import Checkout from "./components/BuyProducts/Checkout.jsx";
 import ManageProducts from "./components/SellProducts/ManageProducts.jsx";
 import ModifyProducts from "./components/SellProducts/ModifyProducts.jsx";
+import ManageOrders from "./components/SellProducts/ManageOrders.jsx";
+import Payment from "./components/BuyProducts/Payment.jsx";
 import ManageAccount from "./components/SellProducts/ManageAccount.jsx";
-import Payment from "./components/BuyProducts/payment.jsx";
 import { ToastContainer } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -44,17 +46,19 @@ const App = () => {
           <Route path="/sell" element={<SellProducts />} />
           <Route path="/sell/manage" element={<ManageProducts />} />
           <Route path='/sell/modify/:id' element={<ModifyProducts />} />
+          <Route path='/sell/manageorders' element={<ManageOrders />} />
           <Route path='/sell/account' element={<ManageAccount />} />
+
           
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />
           <Route path="/buy/product/:id" element={<ProductDetail />} />
+          <Route path="/buy/myorders" element={<MyOrders />} />
           <Route path="/payment" element={
             <Elements stripe={stripePromise}>
               <Payment />
             </Elements>
-          }
-        />
+          }/>
           <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </div>
