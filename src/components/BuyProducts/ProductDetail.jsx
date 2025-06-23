@@ -61,7 +61,7 @@ const ProductDetail = () => {
       state: { 
         product, 
         quantity,
-        total: product.price * quantity
+        total: product.price * quantity,
       }
     });
   };
