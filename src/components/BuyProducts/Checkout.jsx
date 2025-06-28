@@ -1,20 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { auth, db } from "../../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const orderData = location.state;
   
+  const [userDetails, setUserDetails] = useState(null);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
-    email: '',
+    email: '', 
     address: '',
     phone: ''
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "Users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setUserDetails(userData);
+            setCustomerInfo(prev => ({
+              ...prev,
+              email: userData.email,
+              name: userData.user 
+            }));
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+          toast.error("Error loading user data");
+        }
+      } 
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleCheckout = async (e) => {
     e.preventDefault();
@@ -28,15 +56,24 @@ const Checkout = () => {
       state: {
         productId: orderData.product.id,
         quantity: orderData.quantity,
-        buyerName: customerInfo.name,
-        buyerEmail: customerInfo.email,
+        buyerName: userDetails.user, 
+        buyerEmail: userDetails.email, 
         buyerAddress: customerInfo.address,
         buyerPhone: customerInfo.phone,
         total: orderData.total,
         sellerId: orderData.product.userid,
       }
     });
+  }
 
+  if (!userDetails) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <div className="text-xl">Loading...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -51,24 +88,6 @@ const Checkout = () => {
             <h2 className="text-xl font-semibold mb-4">Your Information</h2>
             
             <form onSubmit={handleCheckout} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                value={customerInfo.name}
-                onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                required
-              />
-              
-              <input
-                type="email"
-                placeholder="Your Email"
-                value={customerInfo.email}
-                onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                required
-              />
-              
               <input
                 type="tel"
                 placeholder="Phone Number"

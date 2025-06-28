@@ -18,6 +18,7 @@ import ModifyProducts from "./components/SellProducts/ModifyProducts.jsx";
 import ManageOrders from "./components/SellProducts/ManageOrders.jsx";
 import Payment from "./components/BuyProducts/Payment.jsx";
 import ManageAccount from "./components/SellProducts/ManageAccount.jsx";
+import WriteReview from "./components/BuyProducts/WriteReview.jsx";
 import { ToastContainer } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -54,6 +55,7 @@ const App = () => {
           <Route path="/buy/search" element={<SearchPage />} />
           <Route path="/buy/product/:id" element={<ProductDetail />} />
           <Route path="/buy/myorders" element={<MyOrders />} />
+          <Route path="/buy/review/:orderId" element={<WriteReview />} />
           <Route path="/payment" element={
             <Elements stripe={stripePromise}>
               <Payment />
