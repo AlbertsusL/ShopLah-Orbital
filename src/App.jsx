@@ -29,9 +29,9 @@ const App = () => {
   const stripePromise = loadStripe("pk_test_51RcLk9Fx0Ih7WgJ9LKuLhVMdhepeYdn5xxn0gdSxd7MOE15xNOBomgShv8TUsOshvsVpSVE3A2RRKGALwAQpjx4k00xQDG3e5s");
   return (
     <div>
-      {location.pathname.startsWith('/buy') && <BuySideNavbar />}
-      {location.pathname.startsWith('/sell') && <SideNavbar />}
-      <Navbar style={{ position: 'sticky', top: 0, zIndex: 1}} />
+      {location.pathname.startsWith('/buy') && <BuySideNavbar className="fixed top-16 left-0 z-40 h-full"/>}
+      {location.pathname.startsWith('/sell') && <SideNavbar className="fixed top-16 left-0 z-40 h-full"/>}
+      <Navbar className="sticky top-0 left-0 w-full z-50" />
       
       {/* Different content based on URL */}
       <div className={showSidebar ? "ml-64" : "content"}>

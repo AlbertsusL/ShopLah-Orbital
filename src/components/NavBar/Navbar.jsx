@@ -67,24 +67,18 @@ const Navbar = () => {
   }
 
   return (
-    <div className='sticky top-0'>
-      {/* Upper Navbar */}
+    <div className='sticky top-0 z-50'>
       <div className="shadow-md bg-white dark:bg-gray-900 dark:text-white duration-200 relative z-40">
         <div className="bg-amber-300 py-2">
           <div className="container flex justify-between items-center">
-            
-            {/* Logo section */}
             <div>
               <Link to="/" className="font-bold text-2xl sm:text-3xl flex gap-2">
                 <img src={Logo} alt="Logo" className="w-10 uppercase" />
                 ShopLah
               </Link>    
             </div> 
-            
-            {/* Middle section with search and cart */}
             <div className="hidden md:flex items-center gap-5">
-              
-              {/* tabs section */}
+
               <div className="hidden md:flex gap-10 mr-4">
                 <a href="#" className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
