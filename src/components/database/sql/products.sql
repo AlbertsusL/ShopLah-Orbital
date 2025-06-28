@@ -32,4 +32,16 @@ CREATE TABLE orders (
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER,
+    product_id INTEGER,
+    buyer_name VARCHAR(255),
+    buyer_email VARCHAR(255),
+    rating INTEGER,
+    comment TEXT,
+    product_name VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW()
+);
 /}

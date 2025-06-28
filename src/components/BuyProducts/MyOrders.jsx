@@ -8,8 +8,6 @@ const MyOrders = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,14 +18,10 @@ const MyOrders = () => {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             setUserDetails(docSnap.data());
-          } else {
-            setError("User not found");
           }
         } catch (error) {
-          setError("Error loading user data");
+          console.error(error);
         }
-      } else {
-        setError("Not logged in");
       }
       setLoading(false);
     });
@@ -43,116 +37,76 @@ const MyOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(`http://localhost:5000/api/orders/buyer/${userDetails.email}`);
       if (response.data.success) {
         setOrders(response.data.orders);
       }
     } catch (err) {
-      setError('Failed to load orders');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredOrders = orders.filter(order => 
-    searchTerm === '' || 
-    order.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.id.toString().includes(searchTerm)
-  );
+  const handleLeaveReview = (order) => {
+    navigate(`/buy/review/${order.id}`, { state: { order } });
+  };
 
   if (loading) {
-    return <div style={{padding: '20px'}}>Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div style={{padding: '20px'}}>
-        <p>Error: {error}</p>
-        <button onClick={fetchOrders}>Retry</button>
-      </div>
-    );
+    return <div className="container mx-auto px-4 py-8">Loading...</div>;
   }
 
   return (
-    <div style={{padding: '20px'}}>
-      <h1>My Orders</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
       
-      <div style={{marginBottom: '20px'}}>
-        <input
-          type="text"
-          placeholder="Search orders..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{padding: '5px', width: '200px', marginRight: '10px'}}
-        />
-        <button onClick={fetchOrders}>Refresh</button>
-      </div>
-
-      <p>Total orders: {filteredOrders.length}</p>
-
-      {filteredOrders.length === 0 ? (
-        <div>
+      {orders.length === 0 ? (
+        <div className="text-center py-8">
           <p>No orders found</p>
-          {orders.length === 0 && (
-            <button onClick={() => navigate('/buy/search')}>
-              Start Shopping
-            </button>
-          )}
+          <button 
+            onClick={() => navigate('/buy/search')}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Start Shopping
+          </button>
         </div>
       ) : (
-        <div>
-          {filteredOrders.map((order) => (
-            <div key={order.id} style={{
-              border: '1px solid #ccc',
-              padding: '15px',
-              marginBottom: '15px'
-            }}>
+        <div className="space-y-4">
+          {orders.map((order) => (
+            <div key={order.id} className="bg-white p-4 rounded shadow">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-medium">Order #{order.id}</h3>
+                <span className={`px-2 py-1 rounded text-sm ${
+                  order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                  order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                  order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {order.status}
+                </span>
+              </div>
               
-              <h3>Order #{order.id}</h3>
-              <p>Date: {new Date(order.created_at).toLocaleDateString()}</p>
-              <p>Status: <strong>{order.status.toUpperCase()}</strong></p>
+              <p className="text-gray-600">{order.product_name}</p>
+              <p className="text-gray-600">Quantity: {order.quantity}</p>
+              <p className="font-medium">Total: ${order.total}</p>
+              <p className="text-sm text-gray-500">
+                {new Date(order.created_at).toLocaleDateString()}
+              </p>
               
-              <hr />
-              
-              <h4>Product Details:</h4>
-              <p>Product: {order.product_name}</p>
-              <p>Quantity: {order.quantity}</p>
-              <p>Price: ${order.product_price} each</p>
-              <p>Total: ${order.total}</p>
-              
-              <h4>Delivery:</h4>
-              <p>Address: {order.buyer_address}</p>
-              <div className="flex justify-between items-center">
-                <p className="mb-0">
-                  Expected: {
-                    order.status === 'delivered' ? 'Delivered' :
-                    order.status === 'cancelled' ? 'Cancelled' :
-                    new Date(new Date(order.created_at).getTime() + 2*24*60*60*1000).toLocaleDateString()
-                  }
-                </p>
-                <div style={{ minWidth: '120px', textAlign: 'right' }}>
-                  {order.status === 'delivered' && (
+              {order.status === 'delivered' && (
+                <div className="mt-3">
+                  {order.has_review ? (
+                    <span className="text-green-600 text-sm">✓ Reviewed</span>
+                  ) : (
                     <button 
-                      className="px-3 py-1"
-                      onClick={() => alert('Review feature coming soon!')}
+                      onClick={() => handleLeaveReview(order)}
+                      className="bg-orange-500 text-white px-3 py-1 rounded text-sm"
                     >
-                      Leave Review
+                      Write Review
                     </button>
                   )}
                 </div>
-              </div>
-              
-              <h4>Progress:</h4>
-              <div>
-                <p>
-                  {order.status === 'pending' && '⏳ Order received, processing soon'}
-                  {order.status === 'processing' && '📦 Being prepared for shipping'}
-                  {order.status === 'shipped' && '🚚 On the way to you'}
-                  {order.status === 'delivered' && '✅ Delivered successfully'}
-                  {order.status === 'cancelled' && '❌ Order cancelled'}
-                </p>
-              </div>
+              )}
             </div>
           ))}
         </div>

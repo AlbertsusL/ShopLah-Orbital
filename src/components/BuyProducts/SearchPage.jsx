@@ -8,6 +8,7 @@ const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [products, setProducts] = useState([]);
+  const [productRatings, setProductRatings] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -21,6 +22,8 @@ const SearchPage = () => {
       const response = await axios.get('http://localhost:5000/api/products');
       if (response.data.success) {
         setProducts(response.data.products);
+        // Fetch ratings for all products
+        fetchAllRatings(response.data.products);
       } else {
         setError('Failed to fetch products');
       }
@@ -29,6 +32,30 @@ const SearchPage = () => {
       setError('Failed to fetch products');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllRatings = async (productList) => {
+    const ratings = {};
+    try {
+      const ratingPromises = productList.map(async (product) => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/orders/reviews/product/${product.id}`);
+          if (response.data.success) {
+            ratings[product.id] = {
+              avgRating: response.data.avgRating,
+              totalReviews: response.data.totalReviews
+            };
+          }
+        } catch (error) {
+          ratings[product.id] = { avgRating: 0, totalReviews: 0 };
+        }
+      });
+      
+      await Promise.all(ratingPromises);
+      setProductRatings(ratings);
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
     }
   };
 
@@ -41,22 +68,22 @@ const SearchPage = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const renderStars = (rating = 4.5) => {
+  const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
-        stars.push(<FaStar key={i} className="text-yellow-400" />);
+      stars.push(<FaStar key={i} className="text-yellow-400" />);
     }
 
     if (hasHalfStar) {
-        stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
+      stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
     }
 
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
-        stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
+      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
     }
 
     return stars;
@@ -114,13 +141,13 @@ const SearchPage = () => {
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#f3b15c]"
+              className="border border-gray-300 rounded px-3 py-2"
             />
             
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#f3b15c]"
+              className="border border-gray-300 rounded px-3 py-2"
             >
               <option value="">All Categories</option>
               <option value="electronics">Electronics</option>
@@ -156,67 +183,74 @@ const SearchPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                
-                {/* Product Image */}
-                <div className="relative overflow-hidden cursor-pointer" onClick={() => handleProductClick(product.id)}>
-                  <img 
-                    src={getProductImage(product)}
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
-                    }}
-                  />
-                  {/* Category Badge */}
-                  <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs capitalize">
-                    {product.category}
-                  </div>
-                  {/* Stock Badge */}
-                  {product.stock === 0 && (
-                    <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
-                      Out of Stock
+            {filteredProducts.map((product) => {
+              const rating = productRatings[product.id] || { avgRating: 0, totalReviews: 0 };
+              
+              return (
+                <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                  
+                  {/* Product Image */}
+                  <div className="relative overflow-hidden cursor-pointer" onClick={() => handleProductClick(product.id)}>
+                    <img 
+                      src={getProductImage(product)}
+                      alt={product.name}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                      }}
+                    />
+                    {/* Category Badge */}
+                    <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs capitalize">
+                      {product.category}
                     </div>
-                  )}
-                </div>
+                    {/* Stock Badge */}
+                    {product.stock === 0 && (
+                      <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                        Out of Stock
+                      </div>
+                    )}
+                  </div>
 
-                {/* Product Info */}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1 cursor-pointer hover:text-[#f3b15c]" onClick={() => handleProductClick(product.id)}>
-                    {product.name}
-                  </h3>
+                  {/* Product Info */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1 cursor-pointer hover:text-[#f3b15c]" onClick={() => handleProductClick(product.id)}>
+                      {product.name}
+                    </h3>
 
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center">
-                      {renderStars(4.5)}
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center">
+                        {renderStars(rating.avgRating)}
+                      </div>
+                      <span className="text-sm text-gray-600">
+                        {rating.avgRating > 0 ? 
+                          `${rating.avgRating} (${rating.totalReviews})` : 
+                          'No reviews'
+                        }
+                      </span>
                     </div>
-                    <span className="text-sm text-gray-600">
-                      4.5 (New)
-                    </span>
-                  </div>
 
-                  {/* Price */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl font-bold text-gray-800">
-                      ${product.price}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Stock: {product.stock}
-                    </span>
-                  </div>
+                    {/* Price */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-2xl font-bold text-gray-800">
+                        ${product.price}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Stock: {product.stock}
+                      </span>
+                    </div>
 
-                  {/* Action Button */}
-                  <button
-                    onClick={() => handleProductClick(product.id)}
-                    className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
-                  >
-                    View Details
-                  </button>
+                    {/* Action Button */}
+                    <button
+                      onClick={() => handleProductClick(product.id)}
+                      className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
