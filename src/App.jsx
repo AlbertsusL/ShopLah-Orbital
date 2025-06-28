@@ -19,6 +19,7 @@ import ManageOrders from "./components/SellProducts/ManageOrders.jsx";
 import Payment from "./components/BuyProducts/Payment.jsx";
 import ManageAccount from "./components/SellProducts/ManageAccount.jsx";
 import WriteReview from "./components/BuyProducts/WriteReview.jsx";
+import Dashboard from "./components/SellProducts/Dashboard.jsx";
 import { ToastContainer } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -49,6 +50,7 @@ const App = () => {
           <Route path='/sell/modify/:id' element={<ModifyProducts />} />
           <Route path='/sell/manageorders' element={<ManageOrders />} />
           <Route path='/sell/account' element={<ManageAccount />} />
+          <Route path="/sell/dashboard" element={<Dashboard/>}/>
 
           
           {/* Buy route */}
