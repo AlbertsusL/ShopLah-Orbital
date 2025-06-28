@@ -26,6 +26,7 @@ router.get('/order/:userid', async (req, res) => {
             WHERE
                 orders.seller_id = $1`, [userid]
         )
+
         const sumQuery = await query(`
             SELECT 
                 SUM(orders.total) AS total_sum
@@ -34,6 +35,7 @@ router.get('/order/:userid', async (req, res) => {
             WHERE
                 orders.seller_id = $1 AND orders.status = 'pending'
         `, [userid]);
+
         const revenueQuery = await query(`
             SELECT 
                 SUM(orders.total) AS total_sum
@@ -52,6 +54,144 @@ router.get('/order/:userid', async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to fetch orders' });
     }
 })
+
+router.get('/dashboard/:userid', async (req, res) => {
+    try {
+        const {userid} = req.params;
+        if (typeof userid !== 'string' || userid.length !== 28) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid user ID format' 
+            });
+        }
+        const reviewResult = await query (
+            `WITH score_series AS (
+                SELECT generate_series(1, 5) AS review_score
+            )
+            SELECT 
+                ss.review_score,
+            COALESCE(COUNT(r.rating), 0) AS review_score_count
+            FROM 
+                score_series ss
+            LEFT JOIN 
+                reviews r
+            ON 
+                ss.review_score = r.rating
+            LEFT JOIN 
+                orders o 
+            ON 
+                o.id = r.order_id
+                AND o.seller_id = $1
+            GROUP BY 
+                ss.review_score
+            ORDER BY 
+                ss.review_score`, [userid]
+        )
+        const revenueMonthQuery = await query (`
+            WITH 
+                month_series 
+            AS (
+            SELECT 
+                generate_series(1, 12) AS month_number
+            ),
+            monthly_orders 
+            AS (
+            SELECT 
+                EXTRACT(MONTH FROM created_at) AS month_number,
+                COUNT(*) AS order_count,
+                COALESCE(SUM(total), 0) AS monthly_revenue
+            FROM 
+                orders
+            WHERE 
+                created_at >= '2025-01-01' AND created_at < '2026-01-01'
+		    AND 
+                seller_id = $1
+            GROUP BY 
+                EXTRACT(MONTH FROM created_at)
+            )
+            SELECT 
+                TO_CHAR(DATE '2025-01-01' + (ms.month_number - 1) * INTERVAL '1 month', 'Mon') AS month,
+                COALESCE(mo.monthly_revenue, 0) AS monthly_revenue
+            FROM 
+                month_series ms
+            LEFT JOIN 
+                monthly_orders mo ON ms.month_number = mo.month_number
+            ORDER BY 
+                ms.month_number`,[userid])
+        const categoryQuery = await query (`
+            SELECT 
+                category, count(category) 
+            FROM
+                products 
+            LEFT JOIN 
+                orders
+            ON
+                orders.product_id = products.id 
+            WHERE 
+                seller_id = $1
+            GROUP BY category`,[userid])
+        const orderStatusQuery = await query (
+            `SELECT 
+                status,
+                count(status) as status_count
+            FROM 
+                orders
+            WHERE
+                orders.seller_id = $1
+            GROUP BY 
+                orders.status`, [userid]
+        )
+        const revenueQuery = await query(`
+            SELECT 
+                SUM(orders.total) AS total_sum
+            FROM 
+                orders
+            WHERE
+                orders.seller_id = $1 AND orders.status = 'delivered'
+        `, [userid]);
+
+        const uniqueUserQuery = await query(`
+            SELECT 
+                COUNT(DISTINCT orders.buyer_email) AS uniqueUsers
+            FROM 
+                orders
+            WHERE
+                orders.seller_id = $1
+        `, [userid]);
+
+        const itemsQuery = await query(`
+            SELECT 
+                COUNT(id) AS itemsCount
+            FROM 
+                products
+            WHERE
+                products.userid = $1
+        `, [userid]);
+
+        const completedOrdersQuery = await query(`
+            SELECT 
+                COUNT(orders.id) AS completedOrdersCount
+            FROM 
+                orders
+            WHERE
+                orders.seller_id = $1 AND status = 'delivered'
+        `, [userid]);
+        res.json({ 
+            success: true, 
+            orderStatus: orderStatusQuery.rows,
+            review: reviewResult.rows,
+            revenue: revenueQuery.rows[0].total_sum || 0,
+            uniqueUsers: uniqueUserQuery.rows[0].uniqueusers || 0,
+            itemsListed: itemsQuery.rows[0].itemscount || 0,
+            category: categoryQuery.rows,
+            revenueMonth:revenueMonthQuery.rows,
+            completedOrders: completedOrdersQuery.rows[0].completedorderscount || 0});
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch orders' });
+    }
+})
+
 router.get('/user/:userid', async (req, res) => {
   try {
         const { userid } = req.params;

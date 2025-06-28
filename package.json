@@ -36,6 +36,7 @@
     "react-router-dom": "^7.6.0",
     "react-slick": "^0.30.3",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.0.2",
     "slick-carousel": "^1.8.1",
     "stripe": "^18.2.1",
     "sweetalert2": "^11.21.2",
