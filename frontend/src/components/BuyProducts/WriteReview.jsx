@@ -52,7 +52,7 @@ const WriteReview = () => {
         <p>Order not found</p>
         <button 
           onClick={() => navigate('/buy/myorders')}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          className="!mt-4 bg-blue-500 text-white px-4 py-2 rounded"
         >
           Back to Orders
         </button>
@@ -64,7 +64,7 @@ const WriteReview = () => {
     <div className="container mx-auto px-4 py-8 max-w-md">
       <button
         onClick={() => navigate('/buy/myorders')}
-        className="mb-4 text-blue-600"
+        className="!mb-4 text-blue-600"
       >
         ← Back to Orders
       </button>

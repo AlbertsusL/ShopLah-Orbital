@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import { query } from '../database.js';
+import { query } from '../database/database.js';
 
 router.get('/order/:userid', async (req, res) => {
     try {

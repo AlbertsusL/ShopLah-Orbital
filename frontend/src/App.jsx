@@ -23,12 +23,15 @@ import Dashboard from "./components/SellProducts/Dashboard.jsx";
 import { ToastContainer } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+import { STRIPE_PUBLISHABLE_KEY } from "./config/api.js";
 
 const App = () => {
   const location = useLocation();
   const showSidebar = location.pathname.startsWith('/buy') || 
                      location.pathname.startsWith('/sell');
-  const stripePromise = loadStripe("pk_test_51RcLk9Fx0Ih7WgJ9LKuLhVMdhepeYdn5xxn0gdSxd7MOE15xNOBomgShv8TUsOshvsVpSVE3A2RRKGALwAQpjx4k00xQDG3e5s");
+  
+  const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+
   return (
     <div>
       {location.pathname.startsWith('/buy') && <BuySideNavbar className="fixed top-16 left-0 z-40 h-full"/>}
@@ -52,7 +55,6 @@ const App = () => {
           <Route path='/sell/account' element={<ManageAccount />} />
           <Route path="/sell/dashboard" element={<Dashboard/>}/>
 
-          
           {/* Buy route */}
           <Route path="/buy/search" element={<SearchPage />} />
           <Route path="/buy/product/:id" element={<ProductDetail />} />

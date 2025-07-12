@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import { query } from '../database.js';
-import { sendEmailToSeller, sendEmailToBuyer } from '../EmailService.js';
+import { query } from '../database/database.js';
+import { sendEmailToSeller, sendEmailToBuyer } from '../services/EmailService.js';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../../firebase/firebase.js';
+import { db } from '../config/firebase.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -71,6 +71,9 @@ router.post('/', async (req, res) => {
     }
 
     // Send Emails
+    // In your orders.js, around line 50-60, make sure you have:
+
+    // Send Emails
     const emailInfo = {
         buyerName: buyerName,
         buyerEmail: buyerEmail,
@@ -82,7 +85,15 @@ router.post('/', async (req, res) => {
         sellerEmail: sellerEmail
     };
 
+    console.log('📧 EMAIL INFO OBJECT:', emailInfo);
+    console.log('🛒 About to send emails...');
+
+    // Send to seller
+    console.log('Sending to seller:', sellerEmail);
     sendEmailToSeller(emailInfo);
+
+    // Send to buyer  
+    console.log('Sending to buyer:', buyerEmail);
     sendEmailToBuyer(emailInfo);
 
     res.json({
