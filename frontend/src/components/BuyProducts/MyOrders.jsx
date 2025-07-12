@@ -100,7 +100,7 @@ const MyOrders = () => {
                   ) : (
                     <button 
                       onClick={() => handleLeaveReview(order)}
-                      className="bg-orange-500 text-white px-3 py-1 rounded text-sm"
+                      className="!bg-orange-500 text-white px-3 py-1 rounded text-sm"
                     >
                       Write Review
                     </button>

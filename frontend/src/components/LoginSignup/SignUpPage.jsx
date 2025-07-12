@@ -24,6 +24,11 @@ const SignUpPage = () => {
       return;
     }
 
+    if (username.length > 20) {
+      toast.error("Username is > 20 Char!", {position: "bottom-center"});
+      return;
+    }
+
     try {
       await createUserWithEmailAndPassword(auth,email,password);
       const user = auth.currentUser;

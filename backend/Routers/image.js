@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 const router = express.Router();
-import uploadToCloud from '../cloudStorage/cloudStorage.js';
+import uploadToCloud from '../services/cloudStorage/cloudStorage.js';
 
 const upload = multer({
   storage: multer.memoryStorage(),

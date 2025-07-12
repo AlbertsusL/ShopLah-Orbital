@@ -1,4 +1,5 @@
-{/*CREATE DATABASE ShopLah;
+{/*
+CREATE DATABASE ShopLah;
 
 CREATE TABLE products (
   id SERIAL PRIMARY KEY,
