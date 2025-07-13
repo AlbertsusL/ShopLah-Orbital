@@ -45,6 +45,15 @@ pool.query('SELECT NOW()', [])
     console.error('❌ Database connection failed:', err.message);
   });
 
+// Root route for Railway health check
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'ShopLah API Server',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/upload', imageRoutes);
@@ -71,7 +80,17 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+process.on('SIGTERM', () => {
+  console.log('🔄 Received SIGTERM, shutting down gracefully...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('🔄 Received SIGINT, shutting down gracefully...');
+  process.exit(0);
+});
+
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`☁️ Using AWS S3 for image storage`);
   console.log(`🌏 AWS Region: ${process.env.AWS_REGION || 'Not configured'}`);
