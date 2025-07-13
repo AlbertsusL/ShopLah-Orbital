@@ -4,6 +4,7 @@ import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from "../../config/api.js";
 
 const ManageOrders = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -49,7 +50,7 @@ const ManageOrders = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get(`http://localhost:5000/api/orders/seller/${userDetails.ID}`);
+      const response = await axios.get(`${API_BASE_URL}/api/orders/seller/${userDetails.ID}`);
 
       if (response.data.success) {
         setOrders(response.data.orders);
@@ -72,7 +73,7 @@ const ManageOrders = () => {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       setLoading(true);
-      const response = await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const response = await axios.put(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         status: newStatus
       });
       

@@ -3,6 +3,7 @@ import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { API_BASE_URL } from "../../config/api.js";
 
 const WriteReview = () => {
   const { orderId } = useParams();
@@ -25,7 +26,7 @@ const WriteReview = () => {
     setIsSubmitting(true);
     
     try {
-      const response = await axios.post('http://localhost:5000/api/orders/reviews', {
+      const response = await axios.post(`${API_BASE_URL}/api/orders/reviews`, {
         orderId: order.id,
         productId: order.product_id,
         buyerName: order.buyer_name,

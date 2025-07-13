@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { API_BASE_URL } from "../../config/api.js";
 
 const stripePromise = loadStripe("pk_test_51RcLk9Fx0Ih7WgJ9LKuLhVMdhepeYdn5xxn0gdSxd7MOE15xNOBomgShv8TUsOshvsVpSVE3A2RRKGALwAQpjx4k00xQDG3e5s");
 
@@ -56,7 +57,7 @@ const PaymentForm = ({ clientSecret }) => {
       }
 
       if (paymentIntent.status === "succeeded") {
-        await axios.post("http://localhost:5000/api/orders", {
+        await axios.post(`${API_BASE_URL}/api/orders`, {
           productId,
           quantity,
           total,
@@ -138,7 +139,7 @@ const PaymentPage = () => {
 
     const createPaymentIntent = async () => {
       try {
-        const { data } = await axios.post("http://localhost:5000/api/orders/create-payment-intent", {
+        const { data } = await axios.post(`${API_BASE_URL}/api/orders/create-payment-intent`, {
           productId,
           quantity,
           total,

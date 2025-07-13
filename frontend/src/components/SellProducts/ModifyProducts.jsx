@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from "../../config/api.js";
 
 const ModifyProducts = () => {
   const { id } = useParams();
@@ -19,7 +20,7 @@ const ModifyProducts = () => {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/products/${id}`);
       if (response.data.success) {
         setProduct(response.data.product);
       } else {
@@ -40,7 +41,7 @@ const ModifyProducts = () => {
   const handleModify = async () => {
     try {
         setLoading(true);
-        await axios.put(`http://localhost:5000/api/products/modify/${id}`, {
+        await axios.put(`${API_BASE_URL}/api/products/modify/${id}`, {
             description:product.description,
             price: product.price,
             stock: product.stock,

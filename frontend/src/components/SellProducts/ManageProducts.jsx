@@ -4,7 +4,7 @@ import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate,useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import { API_BASE_URL } from "../../config/api.js";
 
 const ManageProducts = () => {
     const [userDetails, setUserDetails] = useState(null);
@@ -51,7 +51,7 @@ const ManageProducts = () => {
         try {
             setLoading(true);
             setError('');
-            const response = await axios.get(`http://localhost:5000/api/products/user/${userDetails.ID}`);
+            const response = await axios.get(`${API_BASE_URL}/api/products/user/${userDetails.ID}`);
             
             if (response.data.success) {
                 const transformedProducts = response.data.products.map(product => ({
@@ -96,7 +96,7 @@ const ManageProducts = () => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
                 setLoading(true);
-                const response = await axios.delete(`http://localhost:5000/api/products/delete/${productId}`, {
+                const response = await axios.delete(`${API_BASE_URL}/api/products/delete/${productId}`, {
                     productId:productId,
                 });
                 if (response.data.success) {
