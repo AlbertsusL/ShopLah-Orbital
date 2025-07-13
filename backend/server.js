@@ -1,45 +1,51 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import productRoutes from './Routers/products.js';
+import imageRoutes from './Routers/image.js';
+import ordersRouter from './Routers/orders.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-console.log('🚀 Starting EXPRESS server on port', PORT);
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    process.env.FRONTEND_URL,
+  ].filter(Boolean),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
-// Ultra-simple CORS
-app.use(cors());
+// Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Immediate response routes
-app.get('/', (req, res) => {
-  res.status(200).send('OK');
-});
-
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK' });
-});
+// Routes
+app.use('/api/products', productRoutes);
+app.use('/api/upload', imageRoutes);
+app.use('/api/orders', ordersRouter);
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'healthy' });
+  res.json({ 
+    success: true, 
+    message: 'ShopLah API is running!',
+    storage: 'AWS S3',
+    region: process.env.AWS_REGION || 'Not configured',
+    port: PORT
+  });
 });
 
-// Start server immediately
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ EXPRESS SERVER RUNNING ON PORT ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`☁️ Using AWS S3 for image storage`);
+  console.log(`🌏 AWS Region: ${process.env.AWS_REGION || 'Not configured'}`);
 });
-
-// Prevent any shutdown
-process.on('SIGTERM', () => {
-  console.log('Received SIGTERM - ignoring...');
-});
-
-process.on('SIGINT', () => {
-  console.log('Received SIGINT - ignoring...');
-});
-
-console.log('🎯 Server setup complete');
 
 export default app;

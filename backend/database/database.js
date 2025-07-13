@@ -6,11 +6,11 @@ dotenv.config();
 const { Pool } = pkg;
 
 const pool = new Pool({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT,
     max: 20, 
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
