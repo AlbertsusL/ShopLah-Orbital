@@ -8,14 +8,14 @@ import ordersRouter from './Routers/orders.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // CORS configuration
 const corsOptions = {
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
-    process.env.FRONTEND_URL
+    process.env.FRONTEND_URL,
   ].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -38,12 +38,12 @@ app.get('/api/health', (req, res) => {
     success: true, 
     message: 'ShopLah API is running!',
     storage: 'AWS S3',
-    region: process.env.AWS_REGION || 'Not configured'
+    region: process.env.AWS_REGION || 'Not configured',
+    port: PORT
   });
 });
 
-// Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`☁️ Using AWS S3 for image storage`);
   console.log(`🌏 AWS Region: ${process.env.AWS_REGION || 'Not configured'}`);
