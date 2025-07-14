@@ -26,7 +26,7 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/products`);
+      const response = await axios.get(`${API_BASE_URL}/api/products/${id}`);
       const productData = response.data.product;
       setProduct(productData);
       await fetchSellerInfo(productData.userid);
