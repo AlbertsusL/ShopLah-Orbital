@@ -44,9 +44,10 @@ const AddProductPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProductData({
+    const limitedValue = name === 'description' ? value.slice(0, 500) : value;
+    setProductData({  
       ...productData,
-      [name]: value,
+      [name]: limitedValue,
     });
   };
 
@@ -198,10 +199,14 @@ const AddProductPage = () => {
                 name='description'
                 rows={4}
                 value={productData.description}
+                maxLength = {500}
                 onChange={handleInputChange}
                 required
-                className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none'
+                className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none whitespace-pre-wrap'
               />
+              <p className="text-sm text-gray-500 text-right">
+                {productData.description.length}/500
+              </p>
             </div>
             
             <div>

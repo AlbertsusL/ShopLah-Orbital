@@ -225,7 +225,7 @@ const ProductDetail = () => {
           {/* Description */}
           <div className="mb-6">
             <h3 className="font-semibold text-lg mb-2">Description</h3>
-            <p className="text-gray-700">{product.description}</p>
+            <p className="text-gray-700 break-words max-w-[15ch]">{product.description}</p>
           </div>
 
           {/* Seller Info */}
