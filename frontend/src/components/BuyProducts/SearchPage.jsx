@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import axios from 'axios';
-import Fuse from 'fuse.js'; 
+import Fuse from 'fuse.js';
+import { API_BASE_URL } from "../../config/api.js";
 
 const tokenize = (text = '') =>
   text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(t => t.length > 1);
@@ -44,26 +45,46 @@ const SearchPage = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('http://localhost:5000/api/products');
-      if (data.success) {
-        setProducts(data.products);
-        setTfidfVecs(buildTfidf(data.products));
-        fetchAllRatings(data.products);
-      } else setError('Failed to fetch products');
-    } catch (e) {
-      console.error(e); setError('Failed to fetch products');
-    } finally { setLoading(false); }
+      const response = await axios.get(`${API_BASE_URL}/api/products`);
+      if (response.data.success) {
+        setProducts(response.data.products);
+        setTfidfVecs(buildTfidf(response.data.products));
+        fetchAllRatings(response.data.products);
+      } else {
+        setError('Failed to fetch products');
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setError('Failed to fetch products');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fetchAllRatings = async (list) => {
+  const fetchAllRatings = async (productList) => {
     const ratings = {};
-    await Promise.all(list.map(async (p) => {
-      try {
-        const { data } = await axios.get(`http://localhost:5000/api/orders/reviews/product/${p.id}`);
-        ratings[p.id] = data.success ? { avgRating: data.avgRating, totalReviews: data.totalReviews } : { avgRating: 0, totalReviews: 0 };
-      } catch { ratings[p.id] = { avgRating: 0, totalReviews: 0 }; }
-    }));
-    setProductRatings(ratings);
+    try {
+      const ratingPromises = productList.map(async (product) => {
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/orders/reviews/product/${product.id}`);
+          if (response.data.success) {
+            ratings[product.id] = {
+              avgRating: response.data.avgRating,
+              totalReviews: response.data.totalReviews
+            };
+          } else {
+            ratings[product.id] = { avgRating: 0, totalReviews: 0 };
+          }
+        } catch (error) {
+          ratings[product.id] = { avgRating: 0, totalReviews: 0 };
+        }
+      });
+      
+      await Promise.all(ratingPromises);
+      setProductRatings(ratings);
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+    }
   };
 
   const renderStars = (r) => {

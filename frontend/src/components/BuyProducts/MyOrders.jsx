@@ -3,6 +3,7 @@ import axios from 'axios';
 import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from "../../config/api.js";
 
 const MyOrders = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -37,7 +38,7 @@ const MyOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/orders/buyer/${userDetails.email}`);
+      const response = await axios.get(`${API_BASE_URL}/api/orders/buyer/${userDetails.email}`);
       if (response.data.success) {
         setOrders(response.data.orders);
       }

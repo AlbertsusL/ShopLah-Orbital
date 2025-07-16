@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { API_BASE_URL } from "../../config/api.js";
 
 const Dashboard = () => {
     const [userDetails, setUserDetails] = useState(null);
@@ -47,10 +48,11 @@ const Dashboard = () => {
             fetchOrders(userDetails.ID);
         }
     }, [userDetails]);
+    
     const fetchOrders = async (userId) => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:5000/api/products/dashboard/${userId}`);
+            const response = await axios.get(`${API_BASE_URL}/api/products/dashboard/${userId}`);
             if (response.data.success) {
                 setOrderStatus(response.data.orderStatus);
                 setUniqueUser(response.data.uniqueUsers);

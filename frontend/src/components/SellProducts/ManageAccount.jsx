@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { API_BASE_URL } from "../../config/api.js";
 
 const ManageAccount = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -44,7 +45,7 @@ const ManageAccount = () => {
   const fetchOrders = async (userId) => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/products/order/${userId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/products/order/${userId}`);
       if (response.data.success) {
         setOrders(response.data.order);
         setPendingSum(response.data.totalSum);

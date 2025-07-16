@@ -5,12 +5,29 @@ dotenv.config();
 
 const { Pool } = pkg;
 
+// Check if to use DATABASE_URL or normal var
+const useConnectionString = process.env.DATABASE_URL && process.env.NODE_ENV === 'production';
+
+const connectionConfig = useConnectionString 
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    }
+  : {
+      user: process.env.PGUSER,
+      host: process.env.PGHOST,
+      database: process.env.PGDATABASE,
+      password: process.env.PGPASSWORD,
+      port: process.env.PGPORT,
+      ssl: process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: false
+      } : false
+    };
+
 const pool = new Pool({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
+    ...connectionConfig,
     max: 20, 
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
@@ -18,11 +35,16 @@ const pool = new Pool({
 
 // Test database connection
 pool.on('connect', () => {
-    console.log(' Connected to PostgreSQL database');
+    console.log('✅ Connected to PostgreSQL database');
+    if (useConnectionString) {
+        console.log('🔗 Using DATABASE_URL connection');
+    } else {
+        console.log('🔗 Using individual database variables');
+    }
 });
 
 pool.on('error', (err) => {
-    console.error('Database Error', err);
+    console.error('❌ Database Error', err);
     process.exit(-1);
 });
 

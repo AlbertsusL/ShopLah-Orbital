@@ -1,10 +1,8 @@
-// API configuration
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 // Stripe configuration
 export const STRIPE_PUBLISHABLE_KEY = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
 
-// API endpoints
 export const API_ENDPOINTS = {
   // Products
   PRODUCTS: `${API_BASE_URL}/api/products`,
@@ -33,7 +31,7 @@ export const API_ENDPOINTS = {
   UPLOAD: `${API_BASE_URL}/api/upload`,
   
   // Health
-  HEALTH: `${API_BASE_URL}/health`
+  HEALTH: `${API_BASE_URL}/api/health`
 };
 
 // Helper function for API calls

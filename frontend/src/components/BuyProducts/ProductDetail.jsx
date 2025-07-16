@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
+import { API_BASE_URL } from "../../config/api.js";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/products/${id}`);
       const productData = response.data.product;
       setProduct(productData);
       await fetchSellerInfo(productData.userid);
@@ -39,7 +40,7 @@ const ProductDetail = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/orders/reviews/product/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/orders/reviews/product/${id}`);
       if (response.data.success) {
         setReviews(response.data.reviews);
         setAvgRating(response.data.avgRating);

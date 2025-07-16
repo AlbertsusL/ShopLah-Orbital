@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebase";
 import { toast } from "react-toastify";
 import { doc, getDoc } from "firebase/firestore";
+import { API_BASE_URL } from "../../config/api.js";
 
 const AddProductPage = () => {
   const [productData, setProductData] = useState({
@@ -97,7 +98,7 @@ const AddProductPage = () => {
         throw new Error('At least 1 image is required');
       }
       
-      const response = await axios.post('http://localhost:5000/api/products', {
+      const response = await axios.post(`${API_BASE_URL}/api/products`, {
         ...productData,
         userid: userDetails?.ID || userDetails?.user,
         images: imageUrls, 
@@ -130,7 +131,7 @@ const AddProductPage = () => {
       formData.append('images', image);
     });
 
-    const response = await axios.post('http://localhost:5000/api/upload', formData, {
+    const response = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
