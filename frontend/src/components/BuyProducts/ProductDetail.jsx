@@ -84,19 +84,37 @@ const ProductDetail = () => {
   const handleBuyNow = () => {
     navigate('/checkout', { 
       state: { 
-        product, 
-        quantity,
-        total: product.price * quantity,
+        orderData: [
+          {
+            product:product, 
+            quantity:quantity,
+          }
+        ]
       }
     });
   };
 
-  const handleAddToCart = () => {
-    toast.success(`Added ${quantity} ${product.name}(s) to cart!`);
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`http://localhost:5000/api/products/cart`, {
+        userId:seller.ID,
+        product:product.id,
+        quantity:quantity,
+      });
+      if (response.data.success) {
+        toast.success(`Added ${quantity} ${product.name}(s) to cart!`);
+        window.dispatchEvent(new Event("cart-updated"));
+        navigate('/buy/cart');
+        };
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      toast.error('Unable to add to Cart');
+    } 
   };
 
   const handleBackToSearch = () => {
-    navigate('/buy/search');
+    navigate(-1);
   };
 
   const getProductImages = () => {

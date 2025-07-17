@@ -30,8 +30,9 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      auth.signOut();
       navigate("/signin");
+      window.dispatchEvent(new Event("cart-updated"));
       toast.success("Logged out successfully!");
     } catch (error) {
       toast.error("Error logging out: " + error.message);
