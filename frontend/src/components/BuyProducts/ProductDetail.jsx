@@ -85,6 +85,7 @@ const ProductDetail = () => {
   const handleBuyNow = () => {
     navigate('/checkout', { 
       state: { 
+        buyerid: null,
         orderData: [
           {
             product:product, 
@@ -98,7 +99,7 @@ const ProductDetail = () => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`http://localhost:5000/api/products/cart`, {
+      const response = await axios.post(`${API_BASE_URL}/api/products/cart`, {
         userId:seller.ID,
         product:product.id,
         quantity:quantity,

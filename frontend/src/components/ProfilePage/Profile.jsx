@@ -26,6 +26,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserData();
+    window.dispatchEvent(new Event("cart-updated"));
   }, []);
 
   const handleLogout = async () => {

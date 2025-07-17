@@ -7,7 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { orderData = [] } = location.state || {};
+  const { buyerid, orderData = [] } = location.state || {};
   
   const [userDetails, setUserDetails] = useState(null);
   const [customerInfo, setCustomerInfo] = useState({
@@ -71,6 +71,7 @@ const Checkout = () => {
       buyerPhone: customerInfo.phone,
       grandTotal,
       orderData,
+      buyerid,
   }
 });
   }

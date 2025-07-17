@@ -11,8 +11,8 @@ const stripePromise = loadStripe("pk_test_51RcLk9Fx0Ih7WgJ9LKuLhVMdhepeYdn5xxn0g
 const PaymentForm = ({ clientSecret }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { productId, quantity, buyerName, buyerEmail, buyerAddress, buyerPhone, total, sellerId } = location.state || {};
-  
+  const { buyerName, buyerEmail, buyerAddress, buyerPhone, grandTotal, orderData, buyerid } = location.state || {};
+
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -25,6 +25,7 @@ const PaymentForm = ({ clientSecret }) => {
       toast.error("Payment system is not ready. Please try again.");
       return;
     }
+
 
     setIsProcessing(true);
     setMessage(null);
@@ -40,10 +41,10 @@ const PaymentForm = ({ clientSecret }) => {
               email: buyerEmail,
               phone: buyerPhone,
               address: {
-                line1: buyerAddress?.line1 || "",
-                city: buyerAddress?.city || "",
-                postal_code: buyerAddress?.postalCode || "",
-                country: buyerAddress?.country || "SG"
+                line1: "",
+                city:  "Singapore",
+                postal_code: "",
+                country: "SG"
               }
             }
           }
@@ -57,19 +58,24 @@ const PaymentForm = ({ clientSecret }) => {
       }
 
       if (paymentIntent.status === "succeeded") {
-        await axios.post(`${API_BASE_URL}/api/orders`, {
-          productId,
-          quantity,
-          total,
-          buyerName,
-          buyerEmail,
-          buyerAddress,
-          buyerPhone,
-          sellerId,
-          paymentIntentId: paymentIntent.id
+        orderData.map((item, index) => {
+          axios.post(`${API_BASE_URL}/api/orders`, {
+              productId:item.product.id,
+              quantity:item.quantity,
+              total:item.product.price * item.quantity,
+              buyerName,
+              buyerEmail,
+              buyerAddress,
+              buyerPhone,
+              sellerId:item.product.userid,
+              paymentIntentId: paymentIntent.id
         });
+        if (buyerid) {
+          axios.delete(`${API_BASE_URL}/api/orders/${buyerid}`);
+        }
         toast.success("Payment successful!");
         navigate("/profile");
+        });
       }
     } catch (err) {
       setMessage(err.message);
@@ -112,7 +118,7 @@ const PaymentForm = ({ clientSecret }) => {
                 : 'bg-indigo-600 hover:bg-indigo-700 text-white'
             }`}
           >
-            {isProcessing ? "Processing..." : `Pay $${total.toFixed(2)}`}
+            {isProcessing ? "Processing..." : `Pay $${grandTotal.toFixed(2)}`}
           </button>
         </form>
       </div>
@@ -135,14 +141,12 @@ const PaymentPage = () => {
       return;
     }
 
-    const { productId, quantity, total } = location.state;
+    const {grandTotal} = location.state;
 
     const createPaymentIntent = async () => {
       try {
         const { data } = await axios.post(`${API_BASE_URL}/api/orders/create-payment-intent`, {
-          productId,
-          quantity,
-          total,
+          total:grandTotal,
           payment_method_types: ['card']
         });
         setClientSecret(data.clientSecret);

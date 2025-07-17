@@ -4,6 +4,7 @@ import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate,useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from "../../config/api.js";
 
 const Cart = () => {
     const [userDetails, setUserDetails] = useState(null);
@@ -43,7 +44,7 @@ const Cart = () => {
     const fetchCartItems = async (userId) => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:5000/api/products/cart/${userId}`);
+            const response = await axios.get(`${API_BASE_URL}/api/products/cart/${userId}`);
             if (response.data.success) {
                 setCartItems(response.data.cart);
 
@@ -66,7 +67,7 @@ const Cart = () => {
             if (window.confirm('Are you sure you want to delete this product from cart?')) {
                 try {
                     setLoading(true);
-                    const response = await axios.delete(`http://localhost:5000/api/products/cart/${cartId}`, {
+                    const response = await axios.delete(`${API_BASE_URL}/api/products/cart/${cartId}`, {
                     });
                     if (response.data.success) {
                         toast.success("Product successfully deleted!");
@@ -92,6 +93,7 @@ const Cart = () => {
 
         navigate('/checkout', {
             state: {
+                buyerid: userDetails.ID,
                 orderData
             }
         });

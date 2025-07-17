@@ -339,3 +339,21 @@ router.get('/reviews/product/:productId', async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to fetch reviews' });
     }
 });
+
+router.delete('/:buyerId', async (req, res) => {
+    try {
+        const { buyerId } = req.params;
+        const queryText = `DELETE FROM cart WHERE userid = $1`;
+        await query(queryText, [buyerId]);
+        res.status(200).json({
+            success:true,
+            message: 'Cart items deleted successfully',
+        });
+    } catch (error) {
+        console.error("Error deleting cart:", error);
+        res.status(500).json({
+            success:false,
+            message:'Failed to delete cart',
+        });
+    }
+})
