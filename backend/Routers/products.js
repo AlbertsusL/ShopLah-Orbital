@@ -192,6 +192,89 @@ router.get('/dashboard/:userid', async (req, res) => {
     }
 })
 
+router.get('/cartcount/:userid', async (req, res) => {
+  try {
+        const { userid } = req.params;
+        if (typeof userid !== 'string' || userid.length !== 28) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid user ID format' 
+            });
+        }   
+        const result = await query(`
+            SELECT 
+                COUNT(*) 
+            FROM 
+                cart 
+            WHERE 
+                userid = $1
+        `, [userid]);
+        res.json({ success: true, cart: result.rows[0].count || 0});
+    } catch (error) {
+        console.error('Database error:', {
+        message: error.message,
+        query: error.query,
+        parameters: error.parameters
+    });
+    res.status(500).json({ 
+        success: false, 
+        message: 'Database operation failed',
+        error: error.message 
+    });
+  }
+});
+
+router.get('/cart/:userid', async (req, res) => {
+  try {
+        const { userid } = req.params;
+        if (typeof userid !== 'string' || userid.length !== 28) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid user ID format' 
+            });
+        }   
+        await query(`
+            UPDATE cart 
+            SET quantity = p.stock 
+            FROM products p 
+            WHERE cart.product_id = p.id 
+            AND cart.quantity > p.stock
+            `)
+        const result = await query(`
+            SELECT c.id AS cart_id, c.quantity AS cart_quantity, c.created_at AS added_at, p.*, 
+            COALESCE(
+                json_agg(
+                json_build_object(
+                    'id', pi.id,
+                    'image_url', pi.image_url,
+                    'is_primary', pi.is_primary
+                ) 
+                ORDER BY pi.is_primary DESC, pi.id
+            ) FILTER (WHERE pi.id IS NOT NULL), 
+            '[]'
+            ) AS images
+            FROM cart c
+            JOIN products p ON c.product_id = p.id
+            LEFT JOIN product_images pi ON p.id = pi.product_id
+            WHERE c.userid = $1 AND c.quantity <= p.stock
+            GROUP BY c.id, p.id
+            ORDER BY c.created_at DESC;
+        `, [userid]);
+        res.json({ success: true, cart: result.rows });
+    } catch (error) {
+        console.error('Database error:', {
+        message: error.message,
+        query: error.query,
+        parameters: error.parameters
+    });
+    res.status(500).json({ 
+        success: false, 
+        message: 'Database operation failed',
+        error: error.message 
+    });
+  }
+});
+
 router.get('/user/:userid', async (req, res) => {
   try {
         const { userid } = req.params;
@@ -350,6 +433,33 @@ router.put('/checkout/:id', async (req, res) => {
     }
 })
 
+router.post('/cart', async (req, res) => {
+    const { userId, product, quantity } = req.body;
+
+    try {
+        await query('BEGIN');
+        
+        const productQuery = `
+            INSERT INTO cart (userid, product_id, quantity)
+            VALUES($1, $2, $3) 
+            ON CONFLICT(userid, product_id)
+            DO UPDATE SET quantity = cart.quantity + $3`;
+        
+        await query(productQuery,[userId,product,quantity]);
+
+        await query('COMMIT');
+        
+        res.status(201).json({
+            success: true,
+            message: "Product added to cart successfully"
+        });
+    } catch (error) {
+        await query("ROLLBACK");
+        console.error("Error adding product to cart:", error);
+        res.status(500).json({ success: false, message: "Failed to add product to cart" });
+    }
+});
+
 router.post('/', async (req, res) => {
     const { name, userid, description, price, category, stock, images } = req.body;
 
@@ -395,8 +505,10 @@ router.delete('/delete/:productId', async (req, res) => {
         console.log('Product ID:', productId);
         const queryTextProduct = `DELETE FROM products WHERE id = $1`;
         const queryTextImage = `DELETE FROM product_images WHERE product_id = $1`;
+        const queryTextCart = `DELETE FROM cart WHERE product_id = $1`;
         await query(queryTextImage, [productId]);
         await query(queryTextProduct, [productId]);
+        await query(queryTextCart, [productId]);
         res.status(200).json({
             success:true,
             message: 'Product deleted successfully',
@@ -406,6 +518,24 @@ router.delete('/delete/:productId', async (req, res) => {
         res.status(500).json({
             success:false,
             message:'Failed to delete product',
+        });
+    }
+})
+
+router.delete('/cart/:cartId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const queryDelete = `DELETE FROM cart WHERE id = $1`;
+        await query(queryDelete, [cartId]);
+        res.status(200).json({
+            success:true,
+            message: 'Product deleted successfully from cart',
+        });
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        res.status(500).json({
+            success:false,
+            message:'Failed to delete product from cart',
         });
     }
 })

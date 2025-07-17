@@ -24,6 +24,7 @@ import { ToastContainer } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { STRIPE_PUBLISHABLE_KEY } from "./config/api.js";
+import Cart from "./components/BuyProducts/Cart.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -60,6 +61,7 @@ const App = () => {
           <Route path="/buy/product/:id" element={<ProductDetail />} />
           <Route path="/buy/myorders" element={<MyOrders />} />
           <Route path="/buy/review/:orderId" element={<WriteReview />} />
+          <Route path="/buy/cart" element={<Cart />} />
           <Route path="/payment" element={
             <Elements stripe={stripePromise}>
               <Payment />

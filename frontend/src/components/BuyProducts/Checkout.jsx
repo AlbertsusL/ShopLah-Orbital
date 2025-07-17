@@ -7,7 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const orderData = location.state;
+  const { orderData = [] } = location.state || {};
   
   const [userDetails, setUserDetails] = useState(null);
   const [customerInfo, setCustomerInfo] = useState({
@@ -17,7 +17,18 @@ const Checkout = () => {
     phone: ''
   });
 
+  const grandTotal = orderData.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+
+
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const getProductImage = (product) => {
+        if (product.images && product.images.length > 0) {
+            const primaryImage = product.images.find(img => img.is_primary);
+            return primaryImage ? primaryImage.image_url : product.images[0].image_url;
+        }
+        return 'https://via.placeholder.com/300x200?text=No+Image';
+    };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -47,23 +58,21 @@ const Checkout = () => {
   const handleCheckout = async (e) => {
     e.preventDefault();
     
-    if (!customerInfo.name || !customerInfo.email || !customerInfo.address) {
+    if (!customerInfo.name || !customerInfo.email || !customerInfo.address || !customerInfo.phone) {
       toast.error('Please fill in all information');
       return;
     }
 
     navigate('/payment', {
       state: {
-        productId: orderData.product.id,
-        quantity: orderData.quantity,
-        buyerName: userDetails.user, 
-        buyerEmail: userDetails.email, 
-        buyerAddress: customerInfo.address,
-        buyerPhone: customerInfo.phone,
-        total: orderData.total,
-        sellerId: orderData.product.userid,
-      }
-    });
+      buyerName: userDetails.user,
+      buyerEmail: userDetails.email,
+      buyerAddress: customerInfo.address,
+      buyerPhone: customerInfo.phone,
+      grandTotal,
+      orderData,
+  }
+});
   }
 
   if (!userDetails) {
@@ -109,7 +118,7 @@ const Checkout = () => {
                 disabled={isProcessing}
                 className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
               >
-                {isProcessing ? 'Processing...' : `Buy Now - $${orderData.total.toFixed(2)}`}
+                {isProcessing ? 'Processing...' : `Buy Now - $${grandTotal.toFixed(2)}`}
               </button>
             </form>
           </div>
@@ -118,24 +127,27 @@ const Checkout = () => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Your Order</h2>
             
-            <div className="flex gap-4 mb-4">
+            {orderData.map((item, index) => (
+              <div key={index} className="flex gap-4 mb-4">
               <img 
-                src={orderData.product.images && orderData.product.images.length > 0 ? orderData.product.images[0].image_url : 'https://via.placeholder.com/64x64'} 
-                alt={orderData.product.name}
+                src={getProductImage(item.product) || 'https://via.placeholder.com/64x64'} 
+                alt={item.product.name}
                 className="w-16 h-16 object-cover rounded"
               />
               <div>
-                <h3 className="font-medium">{orderData.product.name}</h3>
-                <p className="text-gray-600">Quantity: {orderData.quantity}</p>
-                <p className="font-semibold">${orderData.product.price}</p>
+                <h3 className="font-medium">{item.product.name}</h3>
+                <p className="text-gray-600">Quantity: {item.quantity}</p>
+                <p className="font-semibold">${Number(item.product.price).toFixed(2)}</p>
+                <p className="text-gray-700">Subtotal: ${(item.product.price * item.quantity).toFixed(2)}</p>
               </div>
             </div>
+            ))}
             
             <hr className="my-4" />
             
             <div className="flex justify-between">
               <span>Total:</span>
-              <span className="font-bold">${orderData.total.toFixed(2)}</span>
+              <span className="font-bold">${grandTotal.toFixed(2)}</span>
             </div>
 
             <div className="mt-4 p-3 bg-blue-50 rounded">

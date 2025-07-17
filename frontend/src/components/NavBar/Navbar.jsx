@@ -2,17 +2,19 @@ import user_icon from '../../assets/person.png';
 import Logo from "../../assets/logo.jpg";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaCartShopping } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useRouteLoaderData } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebase";
 import { toast } from "react-toastify";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const Navbar = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [cartCountValue, setCartCountValue] = useState(0);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -22,6 +24,7 @@ const Navbar = () => {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             setUserDetails(docSnap.data());
+            cartCount(docSnap.data().ID);
           }
         } catch (error) {
           console.error("User data load error:", error);
@@ -31,6 +34,7 @@ const Navbar = () => {
         }
       } else {
         setUserDetails(null);
+        setCartCountValue(0);
       }
       setLoading(false);
     });
@@ -38,12 +42,45 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+  const handleCartUpdate = () => {
+    if (userDetails?.ID) {
+      cartCount(userDetails.ID);
+    } else {
+      setCartCountValue(0);
+    }
+  };
+
+  window.addEventListener("cart-updated", handleCartUpdate);
+  return () => window.removeEventListener("cart-updated", handleCartUpdate);
+}, [userDetails]);
+
   const handleBuyClick = (e) => {
     e.preventDefault();
     if (userDetails) {
       navigate('/buy/search');
     } else {
       toast.error("Please sign in to buy products");
+      navigate("/signin", { state: { from: '/buy/search' } });
+    }
+  };
+  const cartCount = async (userId) => {
+    if (userId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/products/cartcount/${userId}`);
+        setCartCountValue(response.data.cart);
+      } catch {
+        console.error('Error fetching cart count:', error);
+        setCartCountValue(0);
+      }
+    }
+  }
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    if (userDetails) {
+      navigate('/buy/cart');
+    } else {
+      toast.error("Please sign in to view cart");
       navigate("/signin", { state: { from: '/buy/search' } });
     }
   };
@@ -113,15 +150,18 @@ const Navbar = () => {
               
               {/* Cart button */}
               <button 
-                onClick={() => alert("Cart clicked! (This is just a demo)")} 
+                onClick={handleCartClick}
                 className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] 
                 transition-all duration-200 text-white py-1 px-4 rounded-full flex 
-                items-center gap-3 group"
+                items-center gap-3 group relative"
               >
                 <span className="group-hover:block hidden transition-all duration-200">
                   Cart
                 </span>
                 <FaCartShopping className="text-xl text-white drop-shadow sm:cursor-pointer"/>
+                {cartCountValue > 0 && userDetails!==null && (
+                  <span className='absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full'>{cartCountValue}</span>
+                )}
               </button>
               
               {/* Sign In */}

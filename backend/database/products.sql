@@ -45,4 +45,15 @@ CREATE TABLE reviews (
     product_name VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE cart (
+    id SERIAL PRIMARY KEY,
+    userId VARCHAR(255) NOT NULL,
+    product_id INTEGER,
+    quantity INTEGER,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+ALTER TABLE cart
+ADD CONSTRAINT unique_user_product UNIQUE (userId, product_id);
 /}
