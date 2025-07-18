@@ -74,7 +74,6 @@ export const sendLowStockAlert = async (userEmail, userName, productName, curren
         <p>Current stock: <strong>${currentStock}</strong></p>
         <p>Alert level: ${alertLevel}</p>
         <p>Please restock soon!</p>
-        <p>- ShopLah Team</p>
     `;
 
     const mailOptions = {

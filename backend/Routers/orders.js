@@ -5,6 +5,7 @@ import { sendEmailToSeller, sendEmailToBuyer} from '../services/EmailService.js'
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
 import dotenv from 'dotenv';
+import { sendLowStockAlert } from '../services/EmailService.js';
 dotenv.config();
 
 import {Stripe} from "stripe";
@@ -34,6 +35,8 @@ router.post('/', async (req, res) => {
 
     // Reduce Stock
     await query('UPDATE products SET stock = stock - $1 WHERE id = $2', [quantity, productId]);
+
+    checkLowStockAfterOrder(productId);
 
     // Store order
     const orderQuery = `
@@ -354,3 +357,54 @@ router.delete('/:buyerId', async (req, res) => {
         });
     }
 })
+
+async function checkLowStockAfterOrder(productId) {
+    try {
+        // Get updated product info
+        const productResult = await query('SELECT * FROM products WHERE id = $1', [productId]);
+        const product = productResult.rows[0];
+        
+        if (!product) return;
+        
+        // Check if stock is now low
+        if (product.stock <= product.low_stock_alert && product.low_stock_alert > 0) {
+            
+            // Check if we already sent email today
+            const emailCheck = await query(
+                'SELECT * FROM low_stock_emails WHERE product_id = $1 AND email_sent_date = CURRENT_DATE',
+                [productId]
+            );
+            
+            if (emailCheck.rows.length > 0) {
+                console.log('Low stock email already sent today for product:', productId);
+                return;
+            }
+            
+            // Get seller email from Firebase
+            const sellerDoc = await getDoc(doc(db, "Users", product.userid));
+            if (sellerDoc.exists()) {
+                const sellerEmail = sellerDoc.data().email;
+                const sellerName = sellerDoc.data().user;
+                
+                // Send low stock email
+                await sendLowStockAlert(
+                    sellerEmail,
+                    sellerName,
+                    product.name,
+                    product.stock,
+                    product.low_stock_alert
+                );
+                
+                // Record that we sent the email
+                await query(
+                    'INSERT INTO low_stock_emails (product_id, user_id, email_sent_date) VALUES ($1, $2, CURRENT_DATE)',
+                    [productId, product.userid]
+                );
+                
+                console.log('Low stock email sent for product:', product.name);
+            }
+        }
+    } catch (error) {
+        console.error('Error checking low stock after order:', error);
+    }
+}
