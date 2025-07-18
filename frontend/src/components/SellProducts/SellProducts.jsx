@@ -12,6 +12,7 @@ const AddProductPage = () => {
     price: '',
     category: '',
     stock: '',
+    low_stock_alert: '',
   });
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -104,6 +105,7 @@ const AddProductPage = () => {
         images: imageUrls, 
         price: parseFloat(productData.price),
         stock: parseInt(productData.stock),
+        low_stock_alert: parseInt(productData.low_stock_alert) || 0,
       });
       
       if (response.data.success) {
@@ -114,6 +116,7 @@ const AddProductPage = () => {
           price: '',
           category: '',
           stock: '',
+          low_stock_alert: '',
         });
         setImages([]);
         setImagePreviews([]);
@@ -269,12 +272,30 @@ const AddProductPage = () => {
                 className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none'
               />
             </div>
+
+            <div>
+              <label htmlFor='low_stock_alert' className='block text-sm font-medium text-gray-700'>
+                Low Stock Alert (Optional)
+              </label>
+              <input
+                type='number'
+                id='low_stock_alert'
+                name='low_stock_alert'
+                min='0'
+                value={productData.low_stock_alert}
+                onChange={handleInputChange}
+                className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none'
+              />
+              <p className='text-xs text-gray-500 mt-1'>
+                Leave empty if you don't want alerts
+              </p>
+            </div>
             
             <div>
               <label className='block text-sm font-medium text-gray-700'>
                 Product Images*
               </label>
-              <p className='text-xs text-gray-500 mb-2'>Upload up to 5 images (max 2MB each)</p>
+              <p className='text-xs text-gray-500 mb-2'>Upload 1 image (max 2MB)</p>
               
               <div className='mt-1 flex justify-center pb-5 border-2 border-gray-300 border-dashed rounded-md'>
                 <div className='space-y-1 text-center flex flex-col items-center'>

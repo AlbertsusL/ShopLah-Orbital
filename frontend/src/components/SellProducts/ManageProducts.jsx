@@ -206,6 +206,7 @@ const ManageProducts = () => {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Low Stock Alert</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -248,6 +249,19 @@ const ManageProducts = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap font-medium">
                                             ${product.price}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {product.low_stock_alert > 0 ? (
+                                                <span className={`px-2 py-1 text-xs rounded-full ${
+                                                    product.stock <= product.low_stock_alert 
+                                                        ? 'bg-red-100 text-red-800' 
+                                                        : 'bg-green-100 text-green-800'
+                                                }`}>
+                                                    Alert at {product.low_stock_alert}
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400 text-xs">No alert</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap space-x-2">
                                             <button

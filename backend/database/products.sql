@@ -56,4 +56,13 @@ CREATE TABLE cart (
 
 ALTER TABLE cart
 ADD CONSTRAINT unique_user_product UNIQUE (userId, product_id);
+
+ALTER TABLE products ADD COLUMN low_stock_alert INTEGER DEFAULT 0;
+
+CREATE TABLE low_stock_emails (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER,
+    user_id VARCHAR(255),
+    email_sent_date DATE DEFAULT CURRENT_DATE
+);
 /}

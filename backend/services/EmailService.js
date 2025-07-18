@@ -65,3 +65,31 @@ export const sendEmailToBuyer = async (orderInfo) => {
     console.log('Email sent to buyer!');
     return result;
 };
+
+export const sendLowStockAlert = async (userEmail, userName, productName, currentStock, alertLevel) => {
+    const emailContent = `
+        <h2>Low Stock Alert!</h2>
+        <p>Hi ${userName},</p>
+        <p>Your product <strong>${productName}</strong> is running low on stock.</p>
+        <p>Current stock: <strong>${currentStock}</strong></p>
+        <p>Alert level: ${alertLevel}</p>
+        <p>Please restock soon!</p>
+        <p>- ShopLah Team</p>
+    `;
+
+    const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: userEmail,
+        subject: `Low Stock Alert - ${productName}`,
+        html: emailContent
+    };
+
+    try {
+        const result = await transporter.sendMail(mailOptions);
+        console.log('Low stock email sent!');
+        return result;
+    } catch (error) {
+        console.error('Email error:', error);
+        throw error;
+    }
+};

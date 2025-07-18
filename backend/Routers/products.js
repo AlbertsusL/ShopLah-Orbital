@@ -1,6 +1,9 @@
 import express from 'express';
 const router = express.Router();
 import { query } from '../database/database.js';
+import { sendLowStockAlert } from '../services/EmailService.js';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebase.js';
 
 router.get('/order/:userid', async (req, res) => {
     try {
@@ -382,18 +385,21 @@ router.get('/:id', async (req, res) => {
 });
 
 router.put('/modify/:id', async (req, res) => {
-    const {description, price, stock, id} = req.body;
+    const { description, price, stock, id, low_stock_alert } = req.body;
     try {
-        const queryText= `
+        const queryText = `
         UPDATE products 
         SET 
             description = $1,
             price = $2,
-            stock = $3
-        WHERE id = $4 
+            stock = $3,
+            low_stock_alert = $4
+        WHERE id = $5 
         RETURNING *`;
+        
         const result = await query(queryText, 
-            [description, price, stock, id]);
+            [description, price, stock, low_stock_alert || 0, id]);
+        
         res.status(201).json({
             success: true,
             message: "Product updated successfully",
@@ -402,11 +408,11 @@ router.put('/modify/:id', async (req, res) => {
     } catch (error) {
         console.error("Error updating product:", error);
         res.status(500).json({
-            success:false,
-            message:'Failed to update product',
+            success: false,
+            message: 'Failed to update product',
         });
     }
-})
+});
 
 router.put('/checkout/:id', async (req, res) => {
     const {stock, id} = req.body;
@@ -461,17 +467,17 @@ router.post('/cart', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const { name, userid, description, price, category, stock, images } = req.body;
+    const { name, userid, description, price, category, stock, images, low_stock_alert } = req.body;
 
     try {
         await query('BEGIN');
         
         const productQuery = `
-            INSERT INTO products (name, userId, description, price, category, stock)
-            VALUES($1, $2, $3, $4, $5, $6) RETURNING id`;
+            INSERT INTO products (name, userId, description, price, category, stock, low_stock_alert)
+            VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`;
         
         const productResult = await query(productQuery,
-            [name, userid, description, price, category, stock]
+            [name, userid, description, price, category, stock, low_stock_alert || 0]
         );
         
         const productId = productResult.rows[0].id;
@@ -541,3 +547,81 @@ router.delete('/cart/:cartId', async (req, res) => {
 })
 
 export default router;
+
+async function checkLowStock(productId) {
+    try {
+        // Get product info
+        const productResult = await query('SELECT * FROM products WHERE id = $1', [productId]);
+        const product = productResult.rows[0];
+        
+        if (!product) return;
+        
+        // Check if stock is low
+        if (product.stock <= product.low_stock_alert && product.low_stock_alert > 0) {
+            
+            // Check if we already sent email today
+            const emailCheck = await query(
+                'SELECT * FROM low_stock_emails WHERE product_id = $1 AND email_sent_date = CURRENT_DATE',
+                [productId]
+            );
+            
+            if (emailCheck.rows.length > 0) {
+                console.log('Email already sent today for product:', productId);
+                return;
+            }
+            
+            // Get user email from Firebase
+            const userDoc = await getDoc(doc(db, "Users", product.userid));
+            if (userDoc.exists()) {
+                const userEmail = userDoc.data().email;
+                const userName = userDoc.data().user;
+                
+                await sendLowStockAlert(
+                    userEmail,
+                    userName,
+                    product.name,
+                    product.stock,
+                    product.low_stock_alert
+                );
+                
+                await query(
+                    'INSERT INTO low_stock_emails (product_id, user_id, email_sent_date) VALUES ($1, $2, CURRENT_DATE)',
+                    [productId, product.userid]
+                );
+    
+                console.log('Low stock email sent for product:', product.name);
+            }
+        }
+    } catch (error) {
+        console.error('Error checking low stock:', error);
+    }
+}
+
+router.put('/checkout/:id', async (req, res) => {
+    const { stock, id } = req.body;
+    try {
+        const queryText = `
+        UPDATE products 
+        SET 
+            stock = stock - $1
+        WHERE id = $2
+        RETURNING *`;
+        
+        const result = await query(queryText, [stock, id]);
+        
+        // Check if stock is now low
+        checkLowStock(id);
+        
+        res.status(201).json({
+            success: true,
+            message: "Product checked out successfully",
+            product: result.rows[0]
+        });
+    } catch (error) {
+        console.error("Error checking out:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Error checking out',
+        });
+    }
+});

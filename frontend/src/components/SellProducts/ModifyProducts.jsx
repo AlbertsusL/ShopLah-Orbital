@@ -45,6 +45,7 @@ const ModifyProducts = () => {
             description:product.description,
             price: product.price,
             stock: product.stock,
+            low_stock_alert: product.low_stock_alert || 0,
             id: product.id,
         });
         toast.success('Updated successfully');
@@ -199,6 +200,24 @@ const ModifyProducts = () => {
                 required
               >
             </input>
+        </div>
+
+        <div className="flex items-center gap-4 mb-6">
+          <label className="font-medium">Low Stock Alert:</label>
+          <input 
+              value={product.low_stock_alert || ''} 
+              type='number'
+              min='0'
+              onChange={(e) => setProduct(prev => ({
+                  ...prev,
+                  low_stock_alert: parseInt(e.target.value) || 0
+              }))}
+              className="border border-gray-300 rounded px-3 py-2"
+              placeholder="Alert when stock falls below"
+          />
+          <span className="text-sm text-gray-500">
+              Leave 0 for no alerts
+          </span>
         </div>
 
           {/* Action Buttons */}

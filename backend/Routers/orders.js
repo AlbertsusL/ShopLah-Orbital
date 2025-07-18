@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { query } from '../database/database.js';
-import { sendEmailToSeller, sendEmailToBuyer } from '../services/EmailService.js';
+import { sendEmailToSeller, sendEmailToBuyer} from '../services/EmailService.js';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
 import dotenv from 'dotenv';
@@ -69,9 +69,6 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.log('Error getting seller email:', error);
     }
-
-    // Send Emails
-    // In your orders.js, around line 50-60, make sure you have:
 
     // Send Emails
     const emailInfo = {
