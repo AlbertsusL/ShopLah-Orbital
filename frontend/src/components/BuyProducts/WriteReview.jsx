@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -14,6 +14,21 @@ const WriteReview = () => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (order) {
+      axios.get(`${API_BASE_URL}/api/orders/reviews/order/${order.id}`)
+        .then(response => {
+          if (response.data.success && response.data.review) {
+            setRating(response.data.review.rating);
+            setComment(response.data.review.comment);
+          }
+        })
+        .catch(error => {
+          console.log('No existing review found');
+        });
+    }
+  }, [order]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

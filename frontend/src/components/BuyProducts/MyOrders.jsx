@@ -97,7 +97,12 @@ const MyOrders = () => {
               {order.status === 'delivered' && (
                 <div className="mt-3">
                   {order.has_review ? (
-                    <span className="text-green-600 text-sm">✓ Reviewed</span>
+                    <button 
+                      onClick={() => handleLeaveReview(order)}
+                      className="!bg-red-500 text-white px-3 py-1 rounded text-sm"
+                    >
+                      Edit Review
+                    </button>
                   ) : (
                     <button 
                       onClick={() => handleLeaveReview(order)}

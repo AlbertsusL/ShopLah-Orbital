@@ -112,9 +112,14 @@ router.get('/buyer/:buyerEmail', async (req, res) => {
             SELECT 
                 o.*,
                 p.name as product_name,
-                p.price as product_price
+                p.price as product_price,
+                CASE 
+                    WHEN r.id IS NOT NULL THEN true 
+                    ELSE false 
+                END as has_review
             FROM orders o
             JOIN products p ON o.product_id = p.id
+            LEFT JOIN reviews r ON o.id = r.order_id
             WHERE o.buyer_email = $1
             ORDER BY o.created_at DESC
         `;
@@ -408,3 +413,17 @@ async function checkLowStockAfterOrder(productId) {
         console.error('Error checking low stock after order:', error);
     }
 }
+
+router.get('/reviews/order/:orderId', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const result = await query('SELECT * FROM reviews WHERE order_id = $1', [orderId]);
+        
+        res.json({
+            success: true,
+            review: result.rows[0] || null
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error' });
+    }
+});
