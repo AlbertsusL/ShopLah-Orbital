@@ -1,177 +1,145 @@
-import React from 'react'
-import Slider from "react-slick"
-import Image1 from "../../assets/phone.jpg"
-import Image2 from "../../assets/mouse.jpg"
-import Image3 from "../../assets/television.jpg"
-import { FaStar, FaShoppingCart } from "react-icons/fa"
+import React, { useState, useEffect } from 'react'
+import { FaStar } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
-
-const SlideData = () => [
-    {
-        id: 1, 
-        image: Image1,
-        subtitle: "Phone",
-        title:  "Apple iPhone",
-        description: "A brand new iPhone at a discount"
-    }, 
-    {
-        id: 2, 
-        image: Image2,
-        subtitle: "Accessories",
-        title:  "Mouse",
-        description: "Most advanced mouse in 2025"
-    }, 
-    {
-        id: 3, 
-        image: Image3,
-        subtitle: "Homeware",
-        title:  "Television",
-        description: "Clearest Television in town"
-    }
-];
-
-// Sample product
-const SampleProducts = () => [
-    {
-        id: 1,
-        name: "iPhone 15 Pro",
-        price: 1299,
-        image: Image1,
-        rating: 4.8,
-        reviews: 234,
-        category: "Electronics",
-    },
-];
+import axios from 'axios'
+import { API_BASE_URL } from "../../config/api.js"
 
 function MainPageView() {
-    const navigate = useNavigate();
-    
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 4000,
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/products`);
+      if (response.data.success) {
+        setProducts(response.data.products.slice(0, 6));
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  const getProductImage = (product) => {
+    if (product.images && product.images.length > 0) {
+      return product.images[0].image_url;
+    }
+    return 'https://via.placeholder.com/300x200?text=No+Image';
+  };
 
-    const renderStars = (rating) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
+  const handleProductClick = (productId) => {
+    navigate(`/buy/product/${productId}`);
+  };
 
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<FaStar key={i} className="text-yellow-400" />);
-        }
+  const handleBrowseAll = () => {
+    navigate('/buy/search');
+  };
 
-        if (hasHalfStar) {
-            stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
-        }
-
-        const emptyStars = 5 - Math.ceil(rating);
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
-        }
-
-        return stars;
-    };
-
-    return (
-        <div className='min-h-screen bg-gray-50' style={{ position: 'relative', zIndex: '-1'}}>
-            {/* Hero Slider Section */}
-            <div className='container'>
-                <div className="overflow-hidden rounded-3xl min-h-[300px]
-                sm:min-h-[350px] bg-yellow-200 flex justify-center
-                items-center">
-                    <div className='container pb-8 sm:pb-0'>
-                    {/* section */}
-                    <Slider {...settings}>
-                        {SlideData().map((data) => (
-                            <div key={data.id}>
-                                {/*Content*/}
-                                <div className='grid grid-cols-1 sm:grid-cols-2'>
-                                    <div className='flex flex-col justify-center 
-                                    gap-5 sm:pl-3 pt-12 sm:pt-0 text-center sm:text-left
-                                    order-2 sm:order-1 relative z-10'>
-                                        <h1 className='text-2xl sm:text-5xl font-bold'>
-                                            {data.subtitle}</h1>
-                                        <h2 className='text-2xl sm:text-3xl font-sans'>
-                                            {data.title}</h2>
-                                        <text>{data.description}</text>
-                                        <div>
-                                            <button className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-6 py-3 rounded-full hover:opacity-90 transition-opacity font-medium">
-                                                Click To Purchase
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {/*Image*/}
-                                    <div className=''>
-                                        <div>
-                                            <img src={data.image} alt=''
-                                            className='w-[320px] h-[400px] sm:h-[300px]
-                                            sm:scale-120 lg:scale-150 object-contain
-                                            mx-auto'
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </Slider>
-                    </div>
-                </div>
-            </div>
-
-            {/* Products Section */}
-            <div className="container mx-auto px-4 py-16">
-                {/* Products Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {SampleProducts().map((product) => (
-                        <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                            {/* Product Image */}
-                            <div className="relative overflow-hidden">
-                                <img 
-                                    src={product.image} 
-                                    alt={product.name}
-                                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                                />
-                                {/* Category Badge */}
-                                <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs">
-                                    {product.category}
-                                </div>
-                            </div>
-
-                            {/* Product Info */}
-                            <div className="p-6">
-                                <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1">
-                                    {product.name}
-                                </h3>
-
-                                {/* Rating */}
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div className="flex items-center">
-                                        {renderStars(product.rating)}
-                                    </div>
-                                    <span className="text-sm text-gray-600">
-                                        {product.rating} ({product.reviews} reviews)
-                                    </span>
-                                </div>
-
-                                {/* Price */}
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="text-2xl font-bold text-gray-800">
-                                        ${product.price}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+  return (
+    <div className='min-h-screen bg-gray-50'>
+      <div className="bg-yellow-200 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl font-bold mb-4">Welcome to ShopLah!</h1>
+          <p className="text-xl mb-8">Discover amazing products from local sellers</p>
+          <button
+            onClick={handleBrowseAll}
+            className="bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-8 py-3 rounded-full hover:opacity-90 font-medium"
+          >
+            Browse All Products
+          </button>
         </div>
-    )
+      </div>
+
+      {/* Products  */}
+      <div className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2>
+
+        {loading ? (
+          <div className="text-center">
+            <p className="text-xl">Loading products...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center">
+            <p className="text-xl text-gray-600">No products available yet</p>
+            <button
+              onClick={() => navigate('/sell')}
+              className="mt-4 bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white px-6 py-2 rounded-full"
+            >
+              Be the first to sell!
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
+                  onClick={() => handleProductClick(product.id)}
+                >
+                  {/* Product Image */}
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={getProductImage(product)}
+                      alt={product.name}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                      }}
+                    />
+                    {/* Category Badge */}
+                    <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs capitalize">
+                      {product.category}
+                    </div>
+                    {/* Stock Badge */}
+                    {product.stock === 0 && (
+                      <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                        Out of Stock
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1">
+                      {product.name}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                      {product.description}
+                    </p>
+
+                    {/* Price */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-800">
+                        ${parseFloat(product.price).toFixed(2)}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Stock: {product.stock}
+                      </span>
+                    </div>
+
+                    {/* View Button */}
+                    <button className="w-full mt-4 bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-2 rounded-lg hover:opacity-90 transition-opacity">
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default MainPageView

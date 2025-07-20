@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { API_BASE_URL } from "../../config/api.js";
 
 const Navbar = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -60,14 +61,15 @@ const Navbar = () => {
     if (userDetails) {
       navigate('/buy/search');
     } else {
-      toast.error("Please sign in to buy products");
-      navigate("/signin", { state: { from: '/buy/search' } });
+      localStorage.setItem('redirectAfterLogin', '/buy/search');
+      toast.error("Please sign in to browse products");
+      navigate("/signin");
     }
   };
   const cartCount = async (userId) => {
     if (userId) {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/cartcount/${userId}`);
+        const response = await axios.get(`${API_BASE_URL}/api/products/cartcount/${userId}`);
         setCartCountValue(response.data.cart);
       } catch {
         console.error('Error fetching cart count:', error);
@@ -80,8 +82,9 @@ const Navbar = () => {
     if (userDetails) {
       navigate('/buy/cart');
     } else {
+      localStorage.setItem('redirectAfterLogin', '/buy/cart');
       toast.error("Please sign in to view cart");
-      navigate("/signin", { state: { from: '/buy/search' } });
+      navigate("/signin");
     }
   };
 
@@ -90,8 +93,9 @@ const Navbar = () => {
     if (userDetails) {
       navigate('/sell');
     } else {
+      localStorage.setItem('redirectAfterLogin', '/sell');
       toast.error("Please sign in to sell products");
-      navigate("/signin", { state: { from: '/sell' } });
+      navigate("/signin");
     }
   };
 

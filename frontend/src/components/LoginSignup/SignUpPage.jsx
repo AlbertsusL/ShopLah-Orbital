@@ -30,26 +30,43 @@ const SignUpPage = () => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth,email,password);
+      await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
       console.log(user);
+      
       if (user) {
-        await setDoc(doc(db,"Users",user.uid), {
+        await setDoc(doc(db, "Users", user.uid), {
           email: user.email,
           user: username,
           ID: user.uid,
         });
-
       }
-      console.log("User Registered Successfully!!")
-      toast.success("User Registered Successfully!!", {
-        position: "top-center",
-      })
+      
+      console.log("User Registered Successfully!!");
+      
+      // Check if they were trying to go somewhere before
+      const whereTheyWantedToGo = localStorage.getItem('redirectAfterLogin');
+      
+      if (whereTheyWantedToGo) {
+        // Take them to where they wanted to go
+        localStorage.removeItem('redirectAfterLogin');
+        navigate(whereTheyWantedToGo);
+        toast.success("Welcome to ShopLah!", {
+          position: "top-center",
+        });
+      } else {
+        // Normal signup, go to profile
+        navigate("/profile");
+        toast.success("Account created successfully!", {
+          position: "top-center",
+        });
+      }
+      
     } catch (error) {
       console.log(error.message);
       toast.error(error.message, {
         position: "bottom-center",
-      })
+      });
     }
   };
 

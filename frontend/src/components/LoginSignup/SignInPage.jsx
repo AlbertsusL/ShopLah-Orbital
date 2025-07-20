@@ -20,16 +20,30 @@ const SignInPage = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in Successfully");
-      navigate("/profile")
-      toast.success("User Registered Successfully!!", {
-            position: "top-center",
-        })
-      } catch (error) {
-        console.log(error.message);
-        toast.error(error.message, {
-          position: "bottom-center",
-        })
+      
+      const whereTheyWantedToGo = localStorage.getItem('redirectAfterLogin');
+      
+      if (whereTheyWantedToGo) {
+        // Take them to where they wanted to go
+        localStorage.removeItem('redirectAfterLogin');
+        navigate(whereTheyWantedToGo);
+        toast.success("Welcome back!", {
+          position: "top-center",
+        });
+      } else {
+        // Normal login, go to profile
+        navigate("/profile");
+        toast.success("User logged in successfully!", {
+          position: "top-center",
+        });
       }
+      
+    } catch (error) {
+      console.log(error.message);
+      toast.error(error.message, {
+        position: "bottom-center",
+      });
+    }
   };
 
   const handleForgotPassword = async () => {
