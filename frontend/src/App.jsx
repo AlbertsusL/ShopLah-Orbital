@@ -25,6 +25,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { STRIPE_PUBLISHABLE_KEY } from "./config/api.js";
 import Cart from "./components/BuyProducts/Cart.jsx";
+import CheckAuth from "./components/CheckAuth/CheckAuth.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -42,32 +43,37 @@ const App = () => {
       {/* Different content based on URL */}
       <div className={showSidebar ? "ml-64" : "content"}>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<MainPageView />} />
           <Route path="/contactuspage" element={<ContactUsPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/profile" element={<Profile />} />
           
-          {/* Sell route */}
-          <Route path="/sell" element={<SellProducts />} />
-          <Route path="/sell/manage" element={<ManageProducts />} />
-          <Route path='/sell/modify/:id' element={<ModifyProducts />} />
-          <Route path='/sell/manageorders' element={<ManageOrders />} />
-          <Route path='/sell/account' element={<ManageAccount />} />
-          <Route path="/sell/dashboard" element={<Dashboard/>}/>
+          {/* Protected routes - need to be signed in */}
+          <Route path="/profile" element={<CheckAuth page={<Profile />} />} />
 
-          {/* Buy route */}
-          <Route path="/buy/search" element={<SearchPage />} />
-          <Route path="/buy/product/:id" element={<ProductDetail />} />
-          <Route path="/buy/myorders" element={<MyOrders />} />
-          <Route path="/buy/review/:orderId" element={<WriteReview />} />
-          <Route path="/buy/cart" element={<Cart />} />
+          {/* Sell routes - protected */}
+          <Route path="/sell" element={<CheckAuth page={<SellProducts />} />} />
+          <Route path="/sell/manage" element={<CheckAuth page={<ManageProducts />} />} />
+          <Route path='/sell/modify/:id' element={<CheckAuth page={<ModifyProducts />} />} />
+          <Route path='/sell/manageorders' element={<CheckAuth page={<ManageOrders />} />} />
+          <Route path='/sell/account' element={<CheckAuth page={<ManageAccount />} />} />
+          <Route path="/sell/dashboard" element={<CheckAuth page={<Dashboard />} />}/>
+
+          {/* Buy routes - protected */}
+          <Route path="/buy/search" element={<CheckAuth page={<SearchPage />} />} />
+          <Route path="/buy/product/:id" element={<CheckAuth page={<ProductDetail />} />} />
+          <Route path="/buy/myorders" element={<CheckAuth page={<MyOrders />} />} />
+          <Route path="/buy/review/:orderId" element={<CheckAuth page={<WriteReview />} />} />
+          <Route path="/buy/cart" element={<CheckAuth page={<Cart />} />} />
+          <Route path="/checkout" element={<CheckAuth page={<Checkout />} />} />
           <Route path="/payment" element={
-            <Elements stripe={stripePromise}>
-              <Payment />
-            </Elements>
+            <CheckAuth page={
+              <Elements stripe={stripePromise}>
+                <Payment />
+              </Elements>
+            } />
           }/>
-          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </div>
       

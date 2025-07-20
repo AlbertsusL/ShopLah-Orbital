@@ -1,9 +1,6 @@
 import express from 'express';
 const router = express.Router();
 import { query } from '../database/database.js';
-import { sendLowStockAlert } from '../services/EmailService.js';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../config/firebase.js';
 
 router.get('/order/:userid', async (req, res) => {
     try {
