@@ -26,6 +26,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { STRIPE_PUBLISHABLE_KEY } from "./config/api.js";
 import Cart from "./components/BuyProducts/Cart.jsx";
 import CheckAuth from "./components/CheckAuth/CheckAuth.jsx";
+import Favourite from "./components/BuyProducts/Favourite.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -65,6 +66,7 @@ const App = () => {
           <Route path="/buy/product/:id" element={<CheckAuth page={<ProductDetail />} />} />
           <Route path="/buy/myorders" element={<CheckAuth page={<MyOrders />} />} />
           <Route path="/buy/review/:orderId" element={<CheckAuth page={<WriteReview />} />} />
+          <Route path="/buy/favourite" element={<CheckAuth page={<Favourite />} />} />
           <Route path="/buy/cart" element={<CheckAuth page={<Cart />} />} />
           <Route path="/checkout" element={<CheckAuth page={<Checkout />} />} />
           <Route path="/payment" element={

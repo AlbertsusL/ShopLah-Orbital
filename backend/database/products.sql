@@ -54,6 +54,13 @@ CREATE TABLE cart (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE favourites (
+    id SERIAL PRIMARY KEY,
+    userId VARCHAR(255) NOT NULL,
+    product_id INTEGER,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
 ALTER TABLE cart
 ADD CONSTRAINT unique_user_product UNIQUE (userId, product_id);
 

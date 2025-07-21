@@ -43,7 +43,7 @@ const BuySideNavbar = () => {
       {/* Favourites */}
       <div className="p-2">
         <Link
-          to="/buy/favorites"
+          to="/buy/favourite"
           className="flex items-center p-3 rounded-lg transition-colors text-amber-800 hover:bg-amber-100"
         >
           <FontAwesomeIcon icon={faHeart} size="lg" className='mr-2'/> 

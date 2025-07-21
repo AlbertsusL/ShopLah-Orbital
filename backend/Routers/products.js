@@ -224,6 +224,49 @@ router.get('/cartcount/:userid', async (req, res) => {
   }
 });
 
+router.get('/favourites/:userid', async (req, res) => {
+  try {
+        const { userid } = req.params;
+        if (typeof userid !== 'string' || userid.length !== 28) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid user ID format' 
+            });
+        }   
+        const result = await query(`
+            SELECT p.*, 
+            COALESCE(
+                json_agg(
+                json_build_object(
+                    'id', pi.id,
+                    'image_url', pi.image_url,
+                    'is_primary', pi.is_primary
+                ) 
+                ORDER BY pi.is_primary DESC, pi.id
+            ) FILTER (WHERE pi.id IS NOT NULL), 
+            '[]'
+            ) AS images
+            FROM favourites f
+            JOIN products p ON f.product_id = p.id
+            LEFT JOIN product_images pi ON p.id = pi.product_id
+            WHERE f.userid = $1
+            GROUP BY p.id, f.id
+            ORDER BY f.created_at DESC;
+        `, [userid]);
+        res.json({ success: true, favourites: result.rows || []});
+    } catch (error) {
+        console.error('Database error:', {
+        message: error.message,
+        query: error.query,
+        parameters: error.parameters
+    });
+    res.status(500).json({ 
+        success: false, 
+        message: 'Database operation failed',
+        error: error.message 
+    });
+  }
+});
 router.get('/cart/:userid', async (req, res) => {
   try {
         const { userid } = req.params;
@@ -462,6 +505,34 @@ router.post('/cart', async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to add product to cart" });
     }
 });
+
+router.post('/favourites/:productId', async (req, res) => {
+  const { productId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    await query('BEGIN');
+    const existsResult = await query(
+      'SELECT * FROM favourites WHERE userid = $1 AND product_id = $2',
+      [userId, productId]
+    );
+
+    if (existsResult.rowCount > 0) {
+      await query('DELETE FROM favourites WHERE userid = $1 AND product_id = $2', [userId, productId]);
+      await query('COMMIT');
+      return res.status(200).json({ success: true, message: "Product removed from favourites" });
+    } else {
+      await query('INSERT INTO favourites (userid, product_id) VALUES ($1, $2)', [userId, productId]);
+      await query('COMMIT');
+      return res.status(201).json({ success: true, message: "Product added to favourites" });
+    }
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Error toggling favourite:', error);
+    res.status(500).json({ success: false, message: "Failed to toggle favourite" });
+  }
+});
+
 
 router.post('/', async (req, res) => {
     const { name, userid, description, price, category, stock, images, low_stock_alert } = req.body;
