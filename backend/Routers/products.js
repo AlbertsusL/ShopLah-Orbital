@@ -282,7 +282,14 @@ router.get('/cart/:userid', async (req, res) => {
             FROM products p 
             WHERE cart.product_id = p.id 
             AND cart.quantity > p.stock
-            `)
+            `);
+
+        await query(`
+            DELETE FROM cart 
+            USING products p 
+            WHERE cart.product_id = p.id 
+            AND p.stock = 0`);
+            
         const result = await query(`
             SELECT c.id AS cart_id, c.quantity AS cart_quantity, c.created_at AS added_at, p.*, 
             COALESCE(
