@@ -47,7 +47,7 @@ const BuySideNavbar = () => {
           className="flex items-center p-3 rounded-lg transition-colors text-amber-800 hover:bg-amber-100"
         >
           <FontAwesomeIcon icon={faHeart} size="lg" className='mr-2'/> 
-          <span className="font-medium">Favorites</span>
+          <span className="font-medium">Favourites</span>
         </Link>
       </div>
     </div>
