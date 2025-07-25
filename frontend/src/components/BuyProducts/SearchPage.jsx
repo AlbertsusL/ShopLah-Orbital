@@ -256,7 +256,7 @@ const SearchPage = () => {
 
         {filtered.length === 0 ? <p className="text-center text-gray-600">No products found</p> : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" data-testid="search-results">
               {filtered.map(p => {
                 const r = productRatings[p.id] || { avgRating: 0, totalReviews: 0 };
                 return (
@@ -298,7 +298,7 @@ const SearchPage = () => {
             {similar.length > 0 && (
               <div className="mt-12">
                 <h2 className="text-2xl font-bold mb-4">You may also like</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="similar-items">
                   {similar.map(item => (
                     <li key={item.id} className="bg-white p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer" onClick={() => handleClick(item.id)}>
                       <img src={getImg(item)} alt={item.name} className="w-full h-40 object-cover mb-3 rounded" />
