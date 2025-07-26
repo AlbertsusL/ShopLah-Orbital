@@ -1,13 +1,13 @@
 {
-  "name": "exit",
+  "name": "frontend-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "jest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.828.0",
@@ -16,7 +16,6 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.3.1",
-    "@tailwindcss/vite": "^4.1.7",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
@@ -25,6 +24,7 @@
     "env": "^0.0.2",
     "express": "^5.1.0",
     "firebase": "^11.8.1",
+    "fuse.js": "^7.1.0",
     "multer": "^2.0.1",
     "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
@@ -33,43 +33,28 @@
     "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.6.0",
+    "react-router-dom": "^6.24.0",
     "react-slick": "^0.30.3",
     "react-toastify": "^11.0.5",
     "recharts": "^3.0.2",
     "slick-carousel": "^1.8.1",
     "stripe": "^18.2.1",
-    "sweetalert2": "^11.21.2",
-    "tailwindcss": "^4.1.7"
+    "sweetalert2": "^11.21.2"
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",
-    "@babel/node": "^7.27.1",
     "@babel/preset-react": "^7.27.1",
-    "@eslint/js": "^9.25.0",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
+    "@tailwindcss/vite": "^4.1.7",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.4.1",
-    "esbuild": "^0.25.5",
-    "esbuild-runner": "^2.2.2",
+    "autoprefixer": "^10.4.19",
     "eslint": "^9.25.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "nodemon": "^3.1.10",
-    "vite": "^6.3.5"
-  },
-  "description": "Team ID: 7563 Team Name: ShopLah  Brian Yeo Zheng Yu Albertus Frederick Ashali",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AlbertsusL/ShopLah-Orbital.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AlbertsusL/ShopLah-Orbital/issues"
-  },
-  "homepage": "https://github.com/AlbertsusL/ShopLah-Orbital#readme"
+    "jest-environment-jsdom": "^30.0.5",
+    "postcss": "^8.4.38",
+
+    "tailwindcss": "^4.1.7",
+    "vite": "^5.3.1"
+  }
 }
