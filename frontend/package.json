@@ -7,8 +7,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "dev": "vite"
+    "eject": "react-scripts eject"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.828.0",
@@ -17,7 +16,6 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.3.1",
-    "@tailwindcss/vite": "^4.1.7",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.11.0",
     "cors": "^2.8.5",
@@ -55,7 +53,6 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.4.1",
     "esbuild": "^0.25.5",
     "esbuild-runner": "^2.2.2",
     "eslint": "^9.25.0",
@@ -63,20 +60,18 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "jest-environment-jsdom": "^30.0.5",
-    "nodemon": "^3.1.10",
-    "vite": "^6.3.5"
+    "nodemon": "^3.1.10"
   },
-  "description": "Team ID: 7563 Team Name: ShopLah  Brian Yeo Zheng Yu Albertus Frederick Ashali",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AlbertsusL/ShopLah-Orbital.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AlbertsusL/ShopLah-Orbital/issues"
-  },
-  "homepage": "https://github.com/AlbertsusL/ShopLah-Orbital#readme"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
