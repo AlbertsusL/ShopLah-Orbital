@@ -19,16 +19,16 @@ describe('SearchPage - Component Integration', () => {
     auth.onAuthStateChanged.mockImplementation(cb => (cb({ uid: '123' }), () => {}));
     getDoc.mockResolvedValue({ exists: () => true, data: () => ({ ID: 'user-db-id' }) });
     axios.get.mockImplementation(url => {
-        if (url.includes('/api/products/favourites')) {
-            return Promise.resolve({ data: { success: true, favourites: [] } });
-        }
-        if (url.includes('/api/products')) {
-            return Promise.resolve({ data: { success: true, products: mockApiProducts } });
-        }
-        if (url.includes('/api/orders/reviews/product/')) {
-            return Promise.resolve({ data: { success: true, avgRating: 0, totalReviews: 0 } });
-        }
-        return Promise.reject(new Error(`AXIOS GET call to ${url} was not mocked.`));
+      if (url.includes('/api/products/favourites')) {
+        return Promise.resolve({ data: { success: true, favourites: [] } });
+      }
+      if (url.includes('/api/products')) {
+        return Promise.resolve({ data: { success: true, products: mockApiProducts } });
+      }
+      if (url.includes('/api/orders/reviews/product/')) {
+        return Promise.resolve({ data: { success: true, avgRating: 0, totalReviews: 0 } });
+      }
+      return Promise.reject(new Error(`AXIOS GET call to ${url} was not mocked.`));
     });
   });
 
