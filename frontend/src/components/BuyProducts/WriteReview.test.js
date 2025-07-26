@@ -41,7 +41,6 @@ describe('WriteReview Component', () => {
     expect(screen.getByText('A Great Product')).toBeInTheDocument();
     expect(screen.getByText(/order #order123/i)).toBeInTheDocument();
     
-    // This query will now pass because the label and textarea are linked
     expect(screen.getByLabelText(/your review/i)).toBeInTheDocument();
   });
 
@@ -63,7 +62,6 @@ describe('WriteReview Component', () => {
     axios.post.mockResolvedValue({ data: { success: true } });
     render(<BrowserRouter><WriteReview /></BrowserRouter>);
 
-    // Now we can reliably get the input via its accessible label
     const commentInput = screen.getByLabelText(/your review/i);
     fireEvent.change(commentInput, { target: { value: 'This was a fantastic product!' } });
 
@@ -101,7 +99,6 @@ describe('WriteReview Component', () => {
     
     render(<BrowserRouter><WriteReview /></BrowserRouter>);
     
-    // This will find the textarea by its value after the API call resolves
     expect(await screen.findByDisplayValue('It was pretty good.')).toBeInTheDocument();
     
     const starButtons = screen.getAllByRole('button', { name: '' });
