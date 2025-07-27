@@ -66,26 +66,15 @@ router.get('/dashboard/:userid', async (req, res) => {
         }
         const reviewResult = await query (
             `WITH score_series AS (
-                SELECT generate_series(1, 5) AS review_score
-            )
+            SELECT generate_series(1, 5) AS review_score)
             SELECT 
                 ss.review_score,
-            COALESCE(COUNT(r.rating), 0) AS review_score_count
-            FROM 
-                score_series ss
-            LEFT JOIN 
-                reviews r
-            ON 
-                ss.review_score = r.rating
-            LEFT JOIN 
-                orders o 
-            ON 
-                o.id = r.order_id
-                AND o.seller_id = $1
-            GROUP BY 
-                ss.review_score
-            ORDER BY 
-                ss.review_score`, [userid]
+                COUNT(CASE WHEN o.seller_id = $1 THEN 1 ELSE NULL END) AS review_score_count
+            FROM score_series ss
+            LEFT JOIN reviews r ON ss.review_score = r.rating
+            LEFT JOIN orders o ON o.id = r.order_id
+            GROUP BY ss.review_score
+            ORDER BY ss.review_score`, [userid]
         )
         const revenueMonthQuery = await query (`
             WITH 
