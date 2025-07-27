@@ -1,5 +1,3 @@
-// In src/components/BuyProducts/WriteReview.test.js
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter, useNavigate, useLocation } from 'react-router-dom';
@@ -7,7 +5,6 @@ import WriteReview from './WriteReview';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-// Mock the router hooks
 const mockNavigate = jest.fn();
 const mockOrder = {
   id: 'order123',

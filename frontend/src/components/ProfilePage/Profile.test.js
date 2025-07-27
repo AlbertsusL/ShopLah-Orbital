@@ -12,7 +12,7 @@ describe('Profile Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
-    window.dispatchEvent = jest.fn(); // Mock dispatchEvent
+    window.dispatchEvent = jest.fn();
   });
 
   test('displays loading state then user information', async () => {
@@ -32,7 +32,7 @@ describe('Profile Component', () => {
 
   test('handles logout correctly', async () => {
     auth.onAuthStateChanged.mockImplementation(cb => (cb({ uid: 'test-uid' }), () => {}));
-    auth.signOut = jest.fn(); // Mock the signOut function
+    auth.signOut = jest.fn();
     getDoc.mockResolvedValue({
       exists: () => true,
       data: () => ({ user: 'TestUser', email: 'test@example.com' }),
