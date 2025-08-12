@@ -256,8 +256,9 @@ const ProductDetail = () => {
           {/* Quantity Selector */}
           {product.stock > 0 && (
             <div className="flex items-center gap-4 mb-6">
-              <label className="font-medium">Quantity:</label>
+              <label htmlFor="quantity-select" className="font-medium">Quantity:</label>
               <select 
+                id="quantity-select"
                 value={quantity} 
                 onChange={(e) => setQuantity(parseInt(e.target.value))}
                 className="border border-gray-300 rounded px-3 py-2"

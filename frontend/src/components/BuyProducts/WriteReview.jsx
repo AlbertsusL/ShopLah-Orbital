@@ -115,8 +115,9 @@ const WriteReview = () => {
 
           {/* Comment */}
           <div className="mb-4">
-            <label className="block mb-2">Your Review:</label>
+            <label htmlFor="review-comment" className="block mb-2">Your Review:</label>
             <textarea
+              id="review-comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Write your review here..."

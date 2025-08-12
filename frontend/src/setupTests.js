@@ -10,6 +10,7 @@ jest.mock('./firebase/firebase', () => ({
 jest.mock('firebase/firestore', () => ({
   doc: jest.fn(),
   getDoc: jest.fn(),
+  setDoc: jest.fn(),
 }));
 
 jest.mock('react-toastify', () => ({
