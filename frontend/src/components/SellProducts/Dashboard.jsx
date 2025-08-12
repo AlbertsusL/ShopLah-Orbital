@@ -179,7 +179,7 @@ const Dashboard = () => {
                         width={80} 
                     />
                     <Tooltip />
-                    <Bar dataKey="count" fill="#f3b15c" />
+                    <Bar dataKey="count" fill="#f3b16c" />
                     </BarChart>
                 </ResponsiveContainer>
             </div>

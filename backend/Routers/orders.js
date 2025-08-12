@@ -109,14 +109,8 @@ router.get('/buyer/:buyerEmail', async (req, res) => {
         const { buyerEmail } = req.params;
         
         const queryText = `
-            SELECT 
-                o.*,
-                p.name as product_name,
-                p.price as product_price,
-                CASE 
-                    WHEN r.id IS NOT NULL THEN true 
-                    ELSE false 
-                END as has_review
+            SELECT o.*, p.name as product_name, p.price as product_price,
+                CASE WHEN r.id IS NOT NULL THEN true ELSE false END as has_review
             FROM orders o
             JOIN products p ON o.product_id = p.id
             LEFT JOIN reviews r ON o.id = r.order_id
@@ -193,12 +187,8 @@ router.get('/:orderId', async (req, res) => {
         
         const queryText = `
             SELECT 
-                o.*,
-                p.name as product_name,
-                p.price as product_price,
-                p.category as product_category
-            FROM orders o
-            JOIN products p ON o.product_id = p.id
+                o.*, p.name as product_name, p.price as product_price, p.category as product_category
+            FROM orders o JOIN products p ON o.product_id = p.id
             WHERE o.id = $1
         `;
         
@@ -230,7 +220,7 @@ router.post("/create-payment-intent", async (req, res) => {
 
   try {
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: total * 100, // Convert to cents
+      amount: total * 100,
       currency: "sgd",
     });
 

@@ -12,37 +12,21 @@ router.get('/order/:userid', async (req, res) => {
             });
         }
         const result = await query (
-            `SELECT 
-                products.name AS name,
-                orders.total AS total,
-                DATE(orders.created_at) as date,
-                orders.status AS status
-            FROM 
-                orders
-            INNER JOIN 
-                products
-            ON 
-                orders.product_id = products.id
-            WHERE
-                orders.seller_id = $1`, [userid]
-        )
+            `SELECT products.name AS name, orders.total AS total, DATE(orders.created_at) as date, orders.status AS status
+            FROM orders
+            INNER JOIN products ON orders.product_id = products.id
+            WHERE orders.seller_id = $1`, [userid])
 
         const sumQuery = await query(`
-            SELECT 
-                SUM(orders.total) AS total_sum
-            FROM 
-                orders
-            WHERE
-                orders.seller_id = $1 AND orders.status = 'pending'
+            SELECT SUM(orders.total) AS total_sum
+            FROM orders
+            WHERE orders.seller_id = $1 AND orders.status = 'pending'
         `, [userid]);
 
         const revenueQuery = await query(`
-            SELECT 
-                SUM(orders.total) AS total_sum
-            FROM 
-                orders
-            WHERE
-                orders.seller_id = $1 AND orders.status = 'delivered'
+            SELECT SUM(orders.total) AS total_sum
+            FROM orders
+            WHERE orders.seller_id = $1 AND orders.status = 'delivered'
         `, [userid]);
         res.json({ 
             success: true, 
@@ -66,116 +50,64 @@ router.get('/dashboard/:userid', async (req, res) => {
         }
         const reviewResult = await query (
             `WITH score_series AS (
-                SELECT generate_series(1, 5) AS review_score
-            )
+            SELECT generate_series(1, 5) AS review_score)
             SELECT 
-                ss.review_score,
-            COALESCE(COUNT(r.rating), 0) AS review_score_count
-            FROM 
-                score_series ss
-            LEFT JOIN 
-                reviews r
-            ON 
-                ss.review_score = r.rating
-            LEFT JOIN 
-                orders o 
-            ON 
-                o.id = r.order_id
-                AND o.seller_id = $1
-            GROUP BY 
-                ss.review_score
-            ORDER BY 
-                ss.review_score`, [userid]
+            ss.review_score,
+            COUNT(CASE WHEN o.seller_id = $1 THEN 1 ELSE NULL END) AS review_score_count
+            FROM score_series ss
+            LEFT JOIN reviews r ON ss.review_score = r.rating
+            LEFT JOIN orders o ON o.id = r.order_id
+            GROUP BY ss.review_score
+            ORDER BY ss.review_score`, [userid]
         )
         const revenueMonthQuery = await query (`
-            WITH 
-                month_series 
+            WITH month_series 
             AS (
-            SELECT 
-                generate_series(1, 12) AS month_number
-            ),
-            monthly_orders 
+            SELECT generate_series(1, 12) AS month_number), monthly_orders 
             AS (
-            SELECT 
-                EXTRACT(MONTH FROM created_at) AS month_number,
-                COUNT(*) AS order_count,
-                COALESCE(SUM(total), 0) AS monthly_revenue
-            FROM 
-                orders
-            WHERE 
-                created_at >= '2025-01-01' AND created_at < '2026-01-01'
-		    AND 
-                seller_id = $1
-            GROUP BY 
-                EXTRACT(MONTH FROM created_at)
-            )
-            SELECT 
-                TO_CHAR(DATE '2025-01-01' + (ms.month_number - 1) * INTERVAL '1 month', 'Mon') AS month,
-                COALESCE(mo.monthly_revenue, 0) AS monthly_revenue
-            FROM 
-                month_series ms
-            LEFT JOIN 
-                monthly_orders mo ON ms.month_number = mo.month_number
-            ORDER BY 
-                ms.month_number`,[userid])
+            SELECT EXTRACT(MONTH FROM created_at) AS month_number, COUNT(*) AS order_count, COALESCE(SUM(total), 0) AS monthly_revenue
+            FROM orders
+            WHERE created_at >= '2025-01-01' AND created_at < '2026-01-01'
+		    AND seller_id = $1
+            GROUP BY EXTRACT(MONTH FROM created_at))
+            SELECT TO_CHAR(DATE '2025-01-01' + (ms.month_number - 1) * INTERVAL '1 month', 'Mon') AS month,COALESCE(mo.monthly_revenue, 0) AS monthly_revenue
+            FROM month_series ms
+            LEFT JOIN monthly_orders mo ON ms.month_number = mo.month_number
+            ORDER BY ms.month_number`,[userid])
         const categoryQuery = await query (`
-            SELECT 
-                category, count(category) 
-            FROM
-                products 
-            LEFT JOIN 
-                orders
-            ON
-                orders.product_id = products.id 
-            WHERE 
-                seller_id = $1
+            SELECT category, count(category) 
+            FROM products 
+            LEFT JOIN orders
+            ON orders.product_id = products.id 
+            WHERE seller_id = $1
             GROUP BY category`,[userid])
         const orderStatusQuery = await query (
-            `SELECT 
-                status,
-                count(status) as status_count
-            FROM 
-                orders
-            WHERE
-                orders.seller_id = $1
-            GROUP BY 
-                orders.status`, [userid]
+            `SELECT status,count(status) as status_count
+            FROM orders
+            WHERE orders.seller_id = $1
+            GROUP BY orders.status`, [userid]
         )
         const revenueQuery = await query(`
-            SELECT 
-                SUM(orders.total) AS total_sum
-            FROM 
-                orders
-            WHERE
-                orders.seller_id = $1 AND orders.status = 'delivered'
+            SELECT sum(orders.total) AS total_sum
+            FROM orders
+            WHERE orders.seller_id = $1 AND orders.status = 'delivered'
         `, [userid]);
 
         const uniqueUserQuery = await query(`
-            SELECT 
-                COUNT(DISTINCT orders.buyer_email) AS uniqueUsers
-            FROM 
-                orders
-            WHERE
-                orders.seller_id = $1
+            SELECT COUNT(DISTINCT orders.buyer_email) AS uniqueUsers
+            FROM orders
+            WHERE orders.seller_id = $1
         `, [userid]);
 
         const itemsQuery = await query(`
-            SELECT 
-                COUNT(id) AS itemsCount
-            FROM 
-                products
-            WHERE
-                products.userid = $1
-        `, [userid]);
+            SELECT COUNT(id) AS itemsCount
+            FROM products
+            WHERE products.userid = $1`, [userid]);
 
         const completedOrdersQuery = await query(`
-            SELECT 
-                COUNT(orders.id) AS completedOrdersCount
-            FROM 
-                orders
-            WHERE
-                orders.seller_id = $1 AND status = 'delivered'
-        `, [userid]);
+            SELECT COUNT(orders.id) AS completedOrdersCount
+            FROM orders
+            WHERE orders.seller_id = $1 AND status = 'delivered'`, [userid]);
         res.json({ 
             success: true, 
             orderStatus: orderStatusQuery.rows,
@@ -202,12 +134,9 @@ router.get('/cartcount/:userid', async (req, res) => {
             });
         }   
         const result = await query(`
-            SELECT 
-                COUNT(*) 
-            FROM 
-                cart 
-            WHERE 
-                userid = $1
+            SELECT count(*) 
+            FROM cart 
+            WHERE userid = $1
         `, [userid]);
         res.json({ success: true, cart: result.rows[0].count || 0});
     } catch (error) {
