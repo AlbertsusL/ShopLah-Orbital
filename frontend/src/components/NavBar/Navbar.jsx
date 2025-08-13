@@ -1,6 +1,5 @@
 import user_icon from '../../assets/person.png';
 import Logo from "../../assets/logo.jpg";
-import { IoSearchOutline } from "react-icons/io5";
 import { FaCartShopping } from "react-icons/fa6";
 import { Link, useRouteLoaderData } from "react-router-dom";
 import React, { useEffect, useState } from "react";
@@ -71,7 +70,7 @@ const Navbar = () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/products/cartcount/${userId}`);
         setCartCountValue(response.data.cart);
-      } catch {
+      } catch (error) {
         console.error('Error fetching cart count:', error);
         setCartCountValue(0);
       }
@@ -121,14 +120,10 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-5">
 
               <div className="hidden md:flex gap-10 mr-4">
-                <a href="#" className="font-medium text-gray-600 
-                dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
-                  Promotion
-                </a>
-                <a href="#" onClick={handleBuyClick} className="font-medium text-gray-600 
+                <Link to="#" onClick={handleBuyClick} className="font-medium text-gray-600 
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Buy 
-                </a>
+                </Link>
                 <Link to="#" onClick={handleSellClick} className="font-medium text-gray-600 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Sell
                 </Link>
@@ -136,20 +131,6 @@ const Navbar = () => {
                 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors">
                   Contact Us
                 </Link>
-              </div>
-              {/* Search bar */}
-              <div className="relative group hidden sm:block">
-                <input 
-                  type="text"
-                  placeholder="Search"
-                  className="w-[200px] sm:w-[200px] hover:w-[200px] 
-                  transition-all duration-200 rounded-full border border-gray-700 px-2 py-1
-                  focus:outline-none focus:border-1 focus:border-primary
-                  placeholder-black bg-white text-black"
-                />   
-                <IoSearchOutline 
-                  className="text-black hover:text-[#f3b15c] absolute top-2.5 -translate-y-0.5 right-3"
-                />
               </div>
               
               {/* Cart button */}

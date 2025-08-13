@@ -19,9 +19,6 @@ const Checkout = () => {
 
   const grandTotal = orderData.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
 
-
-  const [isProcessing, setIsProcessing] = useState(false);
-
   const getProductImage = (product) => {
         if (product.images && product.images.length > 0) {
             const primaryImage = product.images.find(img => img.is_primary);
@@ -116,10 +113,9 @@ const Checkout = () => {
               
               <button 
                 type="submit"
-                disabled={isProcessing}
-                className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-[#f3b15c] to-[#ed8888] text-white py-3 rounded-lg hover:opacity-90"
               >
-                {isProcessing ? 'Processing...' : `Buy Now - $${grandTotal.toFixed(2)}`}
+                Buy Now - ${grandTotal.toFixed(2)}
               </button>
             </form>
           </div>

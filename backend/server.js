@@ -10,11 +10,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-console.log('🔧 Starting server with configuration:');
-console.log('📍 Port:', PORT);
-console.log('🌏 AWS Region:', process.env.AWS_REGION);
-console.log('🔗 Database connection method:', process.env.DATABASE_URL ? 'DATABASE_URL' : 'Individual variables');
-console.log('🔗 Frontend URL:', process.env.FRONTEND_URL);
+console.log('Starting server with configuration:');
+console.log('Port:', PORT);
+console.log('AWS Region:', process.env.AWS_REGION);
+console.log('Database connection method:', process.env.DATABASE_URL ? 'DATABASE_URL' : 'Individual variables');
 
 // CORS configuration
 const corsOptions = {
@@ -29,7 +28,6 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-console.log('🔒 CORS origins configured:', corsOptions.origin);
 
 // Middleware
 app.use(cors(corsOptions));
@@ -48,18 +46,7 @@ query('SELECT NOW()', [])
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'ShopLah API Server',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      health: '/api/health',
-      products: '/api/products',
-      orders: '/api/orders',
-      upload: '/api/upload'
-    }
-  });
+  res.send('ShopLah API is running');
 });
 
 // Routes
@@ -69,15 +56,7 @@ app.use('/api/orders', ordersRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'ShopLah API is running!',
-    storage: 'AWS S3',
-    region: process.env.AWS_REGION || 'Not configured',
-    port: PORT,
-    timestamp: new Date().toISOString(),
-    database: process.env.DATABASE_URL ? 'Connected via DATABASE_URL' : 'Connected via individual variables'
-  });
+  res.json({ status: 'ok' });
 });
 
 // Error handling
@@ -90,22 +69,14 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Handle shutdown signals
-process.on('SIGTERM', () => {
-  console.log('🔄 Received SIGTERM, shutting down gracefully...');
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  console.log('🔄 Received SIGINT, shutting down gracefully...');
-  process.exit(0);
-});
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`☁️ Using AWS S3 for image storage`);
-  console.log(`🌏 AWS Region: ${process.env.AWS_REGION || 'Not configured'}`);
-  console.log(`✅ Server successfully started at ${new Date().toISOString()}`);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Using AWS S3 for image storage`);
+  console.log(`✅ AWS Region: ${process.env.AWS_REGION || 'Not configured'}`);
 });
 
 export default app;

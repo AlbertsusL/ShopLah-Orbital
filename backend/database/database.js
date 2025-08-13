@@ -54,11 +54,9 @@ export const query = (text, params) => {
     return pool.query(text, params)
         .then(res => {
             const duration = Date.now() - start;
-            console.log(`Query executed`, { text: text.slice(0, 50) + '...', duration, rows: res.rowCount });
             return res;
         })
         .catch(err => {
-            console.error('Database query error:', err);
             throw err;
         });
 };

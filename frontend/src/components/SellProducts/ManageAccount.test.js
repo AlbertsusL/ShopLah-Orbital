@@ -12,7 +12,7 @@ const mockAccountData = {
     { date: '2023-10-27T10:00:00Z', name: 'Product A', total: '100.00', status: 'delivered' },
     { date: '2023-10-26T12:30:00Z', name: 'Product B', total: '50.50', status: 'processing' },
   ],
-  totalSum: 50.50, // Pending sum
+  totalSum: 50.50, 
   revenueSum: 100.00,
 };
 
@@ -42,14 +42,11 @@ describe('ManageAccount Component', () => {
     axios.get.mockResolvedValue({ data: mockAccountData });
     render(<BrowserRouter><ManageAccount /></BrowserRouter>);
 
-    // Check for loading state first
     expect(screen.getByText(/loading.../i)).toBeInTheDocument();
 
-    // Assert that summary data is displayed correctly
-    expect(await screen.findByText('$100')).toBeInTheDocument(); // Revenue
-    expect(screen.getByText('$50.5')).toBeInTheDocument(); // Pending
+    expect(await screen.findByText('$100')).toBeInTheDocument(); 
+    expect(screen.getByText('$50.5')).toBeInTheDocument();
 
-    // Assert that transaction table is rendered with data
     expect(screen.getByText('Product A')).toBeInTheDocument();
     expect(screen.getByText('$50.50')).toBeInTheDocument();
     expect(screen.getByText('delivered')).toBeInTheDocument();
